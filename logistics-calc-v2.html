@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Калькулятор логистики — ПартнёрПромСнаб / НикАрин</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   СВЕТЛАЯ ТЕМА — ПартнёрПромСнаб / НикАрин
+═══════════════════════════════════════════ */
+:root {
+  --bg:         #F4F5F7;
+  --bg2:        #FFFFFF;
+  --bg3:        #F0F1F3;
+  --bg4:        #E8E9EC;
+  --surface:    #FFFFFF;
+  --border:     #DDE0E6;
+  --border2:    #C8CDD6;
+
+  --navy:       #1A2B4A;
+  --navy2:      #243555;
+  --navy-light: rgba(26,43,74,0.07);
+
+  --gold:       #C9881A;
+  --gold2:      #E8A020;
+  --gold-light: rgba(201,136,26,0.10);
+  --gold-border:rgba(201,136,26,0.30);
+
+  --green:      #1A7A45;
+  --green2:     #22A05A;
+  --green-light:rgba(26,122,69,0.08);
+  --green-border:rgba(26,122,69,0.25);
+
+  --red:        #C0321E;
+  --red2:       #E03A22;
+  --red-light:  rgba(192,50,30,0.07);
+  --red-border: rgba(192,50,30,0.25);
+
+  --orange:     #D4520A;
+  --orange-light:rgba(212,82,10,0.08);
+
+  --text:       #0F1923;
+  --text2:      #3D4F66;
+  --text3:      #7A8899;
+  --text4:      #A8B4C0;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+  --shadow:     0 4px 12px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg:  0 12px 32px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 0;
+}
+
+/* ─── SUBTLE PATTERN ─── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(201,136,26,0.04) 0%, transparent 50%),
+    radial-gradient(circle at 85% 80%, rgba(26,43,74,0.04) 0%, transparent 50%);
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg3); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ─── LAYOUT ─── */
+.wrap {
+  position: relative; z-index: 1;
+  max-width: 1000px; margin: 0 auto;
+  padding: 32px 20px 80px;
+}
+
+/* ─── HEADER ─── */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; flex-wrap: wrap;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid var(--border);
+}
+.header-left { display: flex; align-items: center; gap: 16px; }
+
+.logo-mark {
+  width: 48px; height: 48px;
+  background: var(--navy);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+.logo-mark::after {
+  content: 'Н';
+  font-family: 'Unbounded', sans-serif;
+  font-size: 18px; font-weight: 700;
+  color: var(--gold2);
+}
+
+.header-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 18px; font-weight: 600;
+  color: var(--navy); letter-spacing: -0.3px;
+}
+.header-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--text3);
+  letter-spacing: 1.5px; margin-top: 3px;
+  text-transform: uppercase;
+}
+.header-badge {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  color: var(--gold); letter-spacing: 1px;
+  background: var(--gold-light);
+  border: 1px solid var(--gold-border);
+  padding: 6px 14px;
+  text-transform: uppercase;
+}
+.header-badge::before {
+  content: ''; width: 6px; height: 6px;
+  background: var(--gold2); border-radius: 50%;
+}
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.card-head {
+  background: var(--navy);
+  padding: 14px 22px;
+  display: flex; align-items: center; gap: 12px;
+}
+.card-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--gold2);
+  letter-spacing: 2px; opacity: 0.9;
+}
+.card-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 1px; color: rgba(255,255,255,0.85);
+  text-transform: uppercase;
+}
+.card-body { padding: 22px; }
+
+/* ─── FORM GRID ─── */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.g4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; }
+.g-full { grid-column: 1 / -1; }
+
+.divider { height: 1px; background: var(--border); margin: 18px 0; }
+
+/* ─── FIELD ─── */
+.field { display: flex; flex-direction: column; gap: 6px; }
+
+.field-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; font-weight: 500;
+  color: var(--text3); letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.field input, .field select {
+  background: var(--bg3);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  padding: 11px 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 500;
+  outline: none; width: 100%;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none; appearance: none;
+}
+.field input:hover, .field select:hover { border-color: var(--border2); }
+.field input:focus, .field select:focus {
+  border-color: var(--navy2);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(26,43,74,0.08);
+}
+.field input::placeholder { color: var(--text4); font-weight: 400; }
+
+/* SELECT */
+.field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%237A8899' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 38px; cursor: pointer;
+}
+
+/* VOLUME DISPLAY */
+.vol-display {
+  background: var(--bg3); border: 1.5px solid var(--border);
+  padding: 11px 14px; min-height: 44px;
+  display: flex; align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px; font-weight: 600;
+  color: var(--navy); letter-spacing: 0.5px;
+  transition: border-color 0.2s;
+}
+.vol-display.empty { color: var(--text4); font-weight: 400; font-size: 13px; }
+
+.field-hint {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; color: var(--text4); letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+/* ─── CHECKBOXES ─── */
+.checks-row { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 4px; }
+
+.chk-label {
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer; user-select: none;
+  padding: 9px 16px;
+  background: var(--bg3); border: 1.5px solid var(--border);
+  font-size: 13px; font-weight: 500; color: var(--text2);
+  transition: all 0.2s;
+}
+.chk-label:hover { border-color: var(--navy2); color: var(--navy); }
+.chk-label input { display: none; }
+.chk-box {
+  width: 15px; height: 15px;
+  border: 1.5px solid var(--border2); background: #fff;
+  flex-shrink: 0; position: relative;
+  transition: all 0.2s;
+}
+.chk-label input:checked ~ .chk-box {
+  background: var(--navy); border-color: var(--navy);
+}
+.chk-label input:checked ~ .chk-box::after {
+  content: '';
+  position: absolute; top: 1px; left: 4px;
+  width: 4px; height: 8px;
+  border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+  transform: rotate(45deg);
+}
+.chk-label input:checked ~ .chk-text { color: var(--navy); }
+
+/* ─── ZONE INFO BAR ─── */
+.zone-info {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin-top: 14px; padding: 12px 16px;
+  background: var(--navy-light);
+  border-left: 3px solid var(--navy);
+}
+.zone-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 600;
+  color: var(--navy); letter-spacing: 1px;
+}
+.zone-chip span { color: var(--text3); font-weight: 400; }
+
+/* ─── BUTTONS ─── */
+.btn-calc {
+  width: 100%; padding: 17px;
+  background: var(--navy);
+  color: #fff;
+  border: none; cursor: pointer;
+  font-family: 'Unbounded', sans-serif;
+  font-size: 13px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+  transition: all 0.2s;
+  margin-top: 8px;
+  position: relative; overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.btn-calc::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent);
+  pointer-events: none;
+}
+.btn-calc:hover {
+  background: var(--navy2);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+.btn-calc:active { transform: translateY(0); box-shadow: var(--shadow-sm); }
+
+.btn-reset {
+  width: 100%; padding: 12px;
+  background: transparent; color: var(--text3);
+  border: 1.5px solid var(--border2); cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 2px; text-transform: uppercase;
+  transition: all 0.2s; margin-top: 14px;
+}
+.btn-reset:hover {
+  border-color: var(--navy); color: var(--navy);
+  background: var(--navy-light);
+}
+
+/* ─── RESULTS ─── */
+.results { display: none; }
+.results.visible { display: block; }
+
+/* THREE CARDS */
+.r-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
+  margin-bottom: 12px;
+}
+
+.r-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  padding: 22px 20px 20px;
+  position: relative; overflow: hidden;
+}
+.r-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.r-card.market::before { background: var(--text4); }
+.r-card.target::before { background: var(--green2); }
+.r-card.ceiling::before { background: var(--red2); }
+
+.r-card.market { opacity: 0.75; }
+.r-card.target {
+  background: var(--green-light);
+  border-color: var(--green-border);
+  box-shadow: 0 4px 16px rgba(26,122,69,0.12);
+}
+.r-card.ceiling {
+  background: var(--red-light);
+  border-color: var(--red-border);
+}
+
+.r-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8.5px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--text3); margin-bottom: 8px;
+}
+.r-card.target .r-tag { color: var(--green); }
+.r-card.ceiling .r-tag { color: var(--red); }
+
+.r-label {
+  font-size: 11px; color: var(--text2); line-height: 1.4;
+  margin-bottom: 16px; min-height: 32px;
+}
+.r-price {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 30px; font-weight: 700;
+  color: var(--text); letter-spacing: -1px; line-height: 1;
+}
+.r-card.target .r-price {
+  font-size: 38px;
+  color: var(--green);
+}
+.r-card.ceiling .r-price { color: var(--red); }
+.r-card.market .r-price { color: var(--text2); }
+
+.r-unit {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; color: var(--text3); margin-top: 8px;
+}
+
+.r-icon {
+  position: absolute; top: 18px; right: 16px;
+  font-size: 28px; opacity: 0.08;
+}
+
+/* ─── PROGRESS BAR ─── */
+.bar-section {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  padding: 20px 22px;
+  margin-bottom: 10px;
+}
+.bar-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; font-weight: 600;
+  color: var(--text3); letter-spacing: 2px;
+  text-transform: uppercase; margin-bottom: 14px;
+}
+.bar-track {
+  position: relative; height: 28px;
+  background: var(--bg3); border: 1px solid var(--border);
+  overflow: hidden;
+}
+.bar-fill-market {
+  position: absolute; top: 0; left: 0; height: 100%;
+  background: rgba(26,43,74,0.06);
+  transition: width 0.9s cubic-bezier(.4,0,.2,1);
+}
+.bar-fill-trade {
+  position: absolute; top: 0; height: 100%;
+  background: linear-gradient(90deg,
+    rgba(26,122,69,0.25) 0%,
+    rgba(192,50,30,0.25) 100%);
+  border-left: 2px solid var(--green2);
+  border-right: 2px solid var(--red2);
+  transition: left 0.9s cubic-bezier(.4,0,.2,1), width 0.9s cubic-bezier(.4,0,.2,1);
+}
+.bar-labels {
+  display: flex; justify-content: space-between;
+  margin-top: 8px;
+}
+.bar-l {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; color: var(--text3);
+}
+.bar-l.green { color: var(--green); font-weight: 600; }
+.bar-l.red { color: var(--red); font-weight: 600; }
+
+/* ─── INFO PILLS ─── */
+.pills-row {
+  display: flex; gap: 8px;
+  margin-bottom: 10px;
+}
+.pill {
+  flex: 1;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.pill-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8.5px; color: var(--text3);
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+.pill-val {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 13px; font-weight: 600; color: var(--navy);
+}
+
+/* ─── ECONOMY ─── */
+.economy {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--gold-light);
+  border: 1.5px solid var(--gold-border);
+  padding: 16px 22px; margin-bottom: 10px;
+}
+.economy-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; font-weight: 600;
+  color: var(--gold); letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.economy-val {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 20px; font-weight: 700; color: var(--gold);
+}
+
+/* ─── BREAKDOWN ─── */
+.breakdown {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  padding: 18px 22px; margin-bottom: 10px;
+}
+.breakdown-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; color: var(--text3); letter-spacing: 2px;
+  text-transform: uppercase; margin-bottom: 14px;
+}
+.bk-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 0; border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.bk-row:last-child { border-bottom: none; }
+.bk-name { color: var(--text2); }
+.bk-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 600; color: var(--navy);
+}
+.bk-val.pos { color: var(--green); }
+.bk-val.neg { color: var(--red); }
+
+/* ─── FOOTER ─── */
+.footer {
+  margin-top: 40px; padding-top: 20px;
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 8px;
+}
+.footer-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; color: var(--text4); letter-spacing: 1px;
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.anim { animation: fadeUp 0.45s ease forwards; }
+.anim-1 { animation-delay: 0.05s; opacity: 0; }
+.anim-2 { animation-delay: 0.12s; opacity: 0; }
+.anim-3 { animation-delay: 0.19s; opacity: 0; }
+.anim-4 { animation-delay: 0.26s; opacity: 0; }
+.anim-5 { animation-delay: 0.33s; opacity: 0; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 720px) {
+  .r-grid { grid-template-columns: 1fr; }
+  .g2, .g3, .g4 { grid-template-columns: 1fr; }
+  .pills-row { flex-direction: column; }
+  .header { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 480px) {
+  .r-card.target .r-price { font-size: 30px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <div class="logo-mark"></div>
+    <div>
+      <div class="header-title">Калькулятор логистики</div>
+      <div class="header-sub">ПартнёрПромСнаб · НикАрин · Внутренний инструмент</div>
+    </div>
+  </div>
+  <div class="header-badge">Версия 2.0</div>
+</header>
+
+<!-- БЛОК 1: МАРШРУТ -->
+<div class="card">
+  <div class="card-head">
+    <span class="card-num">01 //</span>
+    <span class="card-title">Параметры маршрута</span>
+  </div>
+  <div class="card-body">
+    <div class="g2">
+      <div class="field">
+        <label class="field-label">Расстояние</label>
+        <input type="number" id="distance" min="1" placeholder="например, 860" oninput="onInput()">
+        <div class="field-hint">КИЛОМЕТРЫ (по карте)</div>
+      </div>
+      <div class="field">
+        <label class="field-label">Тип маршрута</label>
+        <select id="routeType" onchange="onInput()">
+          <option value="rf">Россия (РФ)</option>
+          <option value="kz">Казахстан (СНГ)</option>
+          <option value="kg">Кыргызстан / Узбекистан (СНГ)</option>
+          <option value="by">Беларусь / Прочее СНГ</option>
+        </select>
+        <div class="field-hint">ВЛИЯЕТ НА ТАРИФ (+20-30% СНГ)</div>
+      </div>
+    </div>
+
+    <!-- Зона-подсказка -->
+    <div class="zone-info" id="zoneInfo">
+      <span class="zone-chip">Зона: <span id="zoneName">—</span></span>
+      <span class="zone-chip">Базовая ставка: <span id="zoneRate">—</span></span>
+      <span class="zone-chip">Мин. стоимость: <span id="zoneMin">—</span></span>
+    </div>
+  </div>
+</div>
+
+<!-- БЛОК 2: ГРУЗ -->
+<div class="card">
+  <div class="card-head">
+    <span class="card-num">02 //</span>
+    <span class="card-title">Характеристики груза</span>
+  </div>
+  <div class="card-body">
+    <div class="g2">
+      <div class="field">
+        <label class="field-label">Вес груза</label>
+        <input type="number" id="weight" min="0.01" step="0.1" placeholder="например, 1.4" oninput="onInput()">
+        <div class="field-hint">ТОННЫ (1 т = 1000 кг)</div>
+      </div>
+      <div class="field">
+        <label class="field-label">Класс груза</label>
+        <select id="cargoClass" onchange="onInput()">
+          <option value="1">Металл / Станки / Промоборудование (тяжёлый)</option>
+          <option value="2">Запчасти / Ролики / Конвейерные ленты</option>
+          <option value="3">Смешанный / Средний</option>
+          <option value="4">Лёгкий / Объёмный / Упакованный</option>
+        </select>
+        <div class="field-hint">ПЛОТНОСТЬ ГРУЗА → ТАРИФНЫЙ КЛАСС</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="g4">
+      <div class="field">
+        <label class="field-label">Длина</label>
+        <input type="number" id="len" min="0.01" step="0.01" placeholder="0.0" oninput="onInput()">
+        <div class="field-hint">МЕТРЫ</div>
+      </div>
+      <div class="field">
+        <label class="field-label">Ширина</label>
+        <input type="number" id="wid" min="0.01" step="0.01" placeholder="0.0" oninput="onInput()">
+        <div class="field-hint">МЕТРЫ</div>
+      </div>
+      <div class="field">
+        <label class="field-label">Высота</label>
+        <input type="number" id="hei" min="0.01" step="0.01" placeholder="0.0" oninput="onInput()">
+        <div class="field-hint">МЕТРЫ</div>
+      </div>
+      <div class="field">
+        <label class="field-label">Объём (авто)</label>
+        <div class="vol-display empty" id="volDisplay">не задан</div>
+        <div class="field-hint">М³ = Д × Ш × В</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- БЛОК 3: УСЛОВИЯ -->
+<div class="card">
+  <div class="card-head">
+    <span class="card-num">03 //</span>
+    <span class="card-title">Тип транспорта и условия</span>
+  </div>
+  <div class="card-body">
+    <div class="g2">
+      <div class="field">
+        <label class="field-label">Тип кузова</label>
+        <select id="bodyType" onchange="onInput()">
+          <option value="tent">Тент — стандарт</option>
+          <option value="board">Борт / Открытая платформа</option>
+          <option value="isotherm">Изотерм (без холода)</option>
+          <option value="refrig">Рефрижератор</option>
+          <option value="lowbed">Низкорамный трал (негабарит)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label">Тип загрузки</label>
+        <div class="checks-row">
+          <label class="chk-label">
+            <input type="checkbox" id="loadRear">
+            <div class="chk-box"></div>
+            <span class="chk-text">Задняя</span>
+          </label>
+          <label class="chk-label">
+            <input type="checkbox" id="loadSide">
+            <div class="chk-box"></div>
+            <span class="chk-text">Боковая</span>
+          </label>
+          <label class="chk-label">
+            <input type="checkbox" id="loadTop">
+            <div class="chk-box"></div>
+            <span class="chk-text">Верхняя</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- КНОПКА -->
+<button class="btn-calc" onclick="calculate()">→ Рассчитать стоимость перевозки</button>
+
+<!-- РЕЗУЛЬТАТЫ -->
+<section class="results" id="results">
+
+  <div class="r-grid">
+    <div class="r-card market anim anim-1">
+      <div class="r-icon">🏢</div>
+      <div class="r-tag">// Рыночная цена</div>
+      <div class="r-label">Цена крупных ТК и корпораций.<br>Ориентир «ленивого» заказчика.</div>
+      <div class="r-price" id="pMarket">—</div>
+      <div class="r-unit" id="uMarket">руб.</div>
+    </div>
+
+    <div class="r-card target anim anim-2">
+      <div class="r-icon">🎯</div>
+      <div class="r-tag">// Целевая цена логиста</div>
+      <div class="r-label">Закрыть с частником / ИП.<br>Оптимальная цена переговоров.</div>
+      <div class="r-price" id="pTarget">—</div>
+      <div class="r-unit" id="uTarget">руб. · Target Price</div>
+    </div>
+
+    <div class="r-card ceiling anim anim-3">
+      <div class="r-icon">🚫</div>
+      <div class="r-tag">// Красная линия</div>
+      <div class="r-label">Потолок для закладки в сделку.<br>Выше этого — не ехать.</div>
+      <div class="r-price" id="pCeiling">—</div>
+      <div class="r-unit" id="uCeiling">руб. · Ceiling Price</div>
+    </div>
+  </div>
+
+  <!-- ПРОГРЕСС-БАР ЗОНА ТОРГА -->
+  <div class="bar-section anim anim-4">
+    <div class="bar-title">// Зона торга логиста — от целевой до красной линии</div>
+    <div class="bar-track">
+      <div class="bar-fill-market" id="barMarket"></div>
+      <div class="bar-fill-trade"  id="barTrade"></div>
+    </div>
+    <div class="bar-labels">
+      <span class="bar-l">₽ 0</span>
+      <span class="bar-l green" id="bLabelT">↑ Цель</span>
+      <span class="bar-l red"   id="bLabelC">↑ Потолок</span>
+      <span class="bar-l"       id="bLabelM">Рынок</span>
+    </div>
+  </div>
+
+  <!-- ИНФО-ПИЛЛЫ -->
+  <div class="pills-row anim anim-4">
+    <div class="pill">
+      <span class="pill-label">Расстояние</span>
+      <span class="pill-val" id="pDistance">—</span>
+    </div>
+    <div class="pill">
+      <span class="pill-label">Вес / Объём</span>
+      <span class="pill-val" id="pWeight">—</span>
+    </div>
+    <div class="pill">
+      <span class="pill-label">Зона / Тип</span>
+      <span class="pill-val" id="pZone">—</span>
+    </div>
+    <div class="pill">
+      <span class="pill-label">Кузов / Загрузка</span>
+      <span class="pill-val" id="pBody">—</span>
+    </div>
+  </div>
+
+  <!-- ДЕТАЛИЗАЦИЯ -->
+  <div class="breakdown anim anim-5">
+    <div class="breakdown-title">// Детализация расчёта</div>
+    <div class="bk-row">
+      <span class="bk-name">База (зона × расстояние)</span>
+      <span class="bk-val" id="dBase">—</span>
+    </div>
+    <div class="bk-row">
+      <span class="bk-name">Минимальный тариф маршрута</span>
+      <span class="bk-val" id="dMin">—</span>
+    </div>
+    <div class="bk-row">
+      <span class="bk-name">Поправка на вес/объём</span>
+      <span class="bk-val" id="dWeight">—</span>
+    </div>
+    <div class="bk-row">
+      <span class="bk-name">Кузов и загрузка</span>
+      <span class="bk-val" id="dBody">—</span>
+    </div>
+    <div class="bk-row">
+      <span class="bk-name">Надбавка СНГ</span>
+      <span class="bk-val" id="dSng">—</span>
+    </div>
+    <div class="bk-row">
+      <span class="bk-name">Базовая себестоимость</span>
+      <span class="bk-val" id="dCost">—</span>
+    </div>
+    <div class="bk-row">
+      <span class="bk-name">Рыночная наценка (+30%)</span>
+      <span class="bk-val neg" id="dMarket">—</span>
+    </div>
+    <div class="bk-row">
+      <span class="bk-name">Скидка НикАрин (−45% от рынка)</span>
+      <span class="bk-val pos" id="dNikarin">—</span>
+    </div>
+  </div>
+
+  <!-- ЭКОНОМИЯ -->
+  <div class="economy anim anim-5">
+    <span class="economy-label">⬡ Экономия НикАрин (vs рыночная цена)</span>
+    <span class="economy-val" id="economyVal">—</span>
+  </div>
+
+  <button class="btn-reset" onclick="reset()">↩ Новый расчёт</button>
+
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <span class="footer-text">НикАрин · ПартнёрПромСнаб · г. Челябинск</span>
+  <span class="footer-text">Внутренний инструмент · Только для сотрудников</span>
+</footer>
+
+</div><!-- /wrap -->
+
+<script>
+/* ╔══════════════════════════════════════════════════════════════════╗
+   ║          МАТЕМАТИЧЕСКОЕ ЯДРО — ТАРИФНАЯ СЕТКА v2.0              ║
+   ║                                                                  ║
+   ║  Калиброван по реальным данным Excel (647 перевозок,             ║
+   ║  июнь 2023 – 2025) и методологии Деловых Линий (LTL).           ║
+   ║                                                                  ║
+   ║  Все коэффициенты вынесены — можно менять без трогания кода.     ║
+   ╚══════════════════════════════════════════════════════════════════╝ */
+
+const T = {
+
+  /* ── ЗОНЫ РАССТОЯНИЙ ──────────────────────────────────────────────
+     Базовая ставка руб/км откалибрована по Excel-данным.
+     Методология Деловых Линий: ставка падает с расстоянием,
+     но добавляется минимальная стоимость рейса.
+  ────────────────────────────────────────────────────────────────── */
+  ZONES: [
+    // { до км, руб/км, мин.стоимость рейса (руб), метка }
+    { max:   80, rate: 95,  minCost: 4500,  label: 'Пригород (<80 км)' },
+    { max:  300, rate: 75,  minCost: 8000,  label: 'Ближняя (80–300 км)' },
+    { max:  600, rate: 55,  minCost: 12000, label: 'Региональная (300–600 км)' },
+    { max:  900, rate: 48,  minCost: 18000, label: 'Межрегиональная (600–900 км)' },
+    { max: 1500, rate: 38,  minCost: 22000, label: 'Дальняя (900–1500 км)' },
+    { max: 2500, rate: 28,  minCost: 28000, label: 'Магистраль (1500–2500 км)' },
+    { max: 9999, rate: 22,  minCost: 32000, label: 'Сверхдальняя (>2500 км)' },
+  ],
+
+  /* ── ТАРИФНЫЙ КЛАСС ГРУЗА ──────────────────────────────────────────
+     Аналог классов Деловых Линий (1–6).
+     Промышленное оборудование = тяжёлый плотный груз → низкий класс.
+     Объёмный лёгкий = высокий класс → дороже.
+  ────────────────────────────────────────────────────────────────── */
+  CARGO_CLASS: {
+    '1': 1.00,  // Металл, промоборудование (плотность >500 кг/м³)
+    '2': 1.08,  // Запчасти, ролики (плотность 200–500 кг/м³)
+    '3': 1.15,  // Смешанный (плотность 100–200 кг/м³)
+    '4': 1.28,  // Лёгкий/объёмный (плотность <100 кг/м³)
+  },
+
+  /* ── КОЭФФИЦИЕНТ ВЕСА ─────────────────────────────────────────────
+     Откалиброван: тяжёлые грузы (5–20т) = эффективный тариф,
+     маленькие грузы платят больше за тонну (минималка рейса).
+  ────────────────────────────────────────────────────────────────── */
+  WEIGHT: [
+    // { до тонн, множитель к базовой ставке }
+    { max: 0.1,  mult: 3.20 }, // Посылка — очень дорого на тонну
+    { max: 0.5,  mult: 2.20 }, // До 500 кг — дорого
+    { max: 1.5,  mult: 1.60 }, // Газель
+    { max: 3.0,  mult: 1.25 }, // Малотоннажник
+    { max: 5.0,  mult: 1.10 }, // 5 т
+    { max: 10.0, mult: 1.00 }, // Стандарт — 10 т (базовый)
+    { max: 20.0, mult: 0.92 }, // Полная загрузка — скидка
+    { max: 30.0, mult: 0.88 }, // Тяжёлая фура
+    { max: 99.0, mult: 1.20 }, // Сверхтяжёлый — спецтранспорт
+  ],
+
+  /* ── ОБЪЁМНЫЙ ВЕС (Деловые Линии: 1 м³ = 250 кг) ─────────────────
+     Если объёмный вес > фактического → считаем по объёмному.
+  ────────────────────────────────────────────────────────────────── */
+  VOL_DENSITY: 250, // кг/м³
+
+  /* ── ТИП КУЗОВА ───────────────────────────────────────────────── */
+  BODY: {
+    tent:    1.00,
+    board:   1.05,
+    isotherm:1.18,
+    refrig:  1.42,
+    lowbed:  1.55,
+  },
+
+  /* ── ТИП ЗАГРУЗКИ ─────────────────────────────────────────────── */
+  LOAD: {
+    side: 0.08,  // +8%
+    top:  0.12,  // +12%
+  },
+
+  /* ── НАДБАВКИ СНГ ─────────────────────────────────────────────── */
+  SNG: {
+    rf:  1.00,  // Россия — без надбавки
+    kz:  1.25,  // Казахстан +25%
+    kg:  1.35,  // Кыргызстан/Узбекистан +35%
+    by:  1.15,  // Беларусь +15%
+  },
+
+  /* ── ЦЕНООБРАЗОВАНИЕ (логика НикАрин) ────────────────────────────
+     Рыночная цена = то, сколько платят корпорации (Деловые Линии + наценка)
+     Целевая цена  = то, за сколько наш логист должен найти частника/ИП
+     Красная линия = максимум, который можно заложить в сделку
+  ────────────────────────────────────────────────────────────────── */
+  MARKET_MARKUP:  1.30,  // +30% от себестоимости = рыночная (ТК-наценка)
+  NIKARIN_TARGET: 0.55,  // 55% от рынка = наша целевая (скидка 45%)
+  CEILING_MULT:   1.15,  // +15% к целевой = красная линия
+};
+
+/* ══════════════════════════════════════════════════════════════════
+   ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+══════════════════════════════════════════════════════════════════ */
+
+function getZone(km) {
+  return T.ZONES.find(z => km <= z.max) || T.ZONES[T.ZONES.length - 1];
+}
+
+function getWeightMult(tons) {
+  return (T.WEIGHT.find(w => tons <= w.max) || T.WEIGHT[T.WEIGHT.length - 1]).mult;
+}
+
+function fmt(n) {
+  return Math.round(n).toLocaleString('ru-RU') + ' ₽';
+}
+function fmtShort(n) {
+  return Math.round(n).toLocaleString('ru-RU');
+}
+function pct(n) {
+  return (n >= 0 ? '+' : '') + n.toFixed(0) + '%';
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   АВТОРАСЧЁТ ОБЪЁМА + ОБНОВЛЕНИЕ ЗОНЫ
+══════════════════════════════════════════════════════════════════ */
+function onInput() {
+  // Объём
+  const l = +document.getElementById('len').value;
+  const w = +document.getElementById('wid').value;
+  const h = +document.getElementById('hei').value;
+  const vd = document.getElementById('volDisplay');
+  let vol = 0;
+  if (l > 0 && w > 0 && h > 0) {
+    vol = l * w * h;
+    vd.textContent = vol.toFixed(2) + ' м³';
+    vd.classList.remove('empty');
+  } else {
+    vd.textContent = 'не задан';
+    vd.classList.add('empty');
+  }
+
+  // Зона
+  const km = +document.getElementById('distance').value;
+  if (km > 0) {
+    const zone = getZone(km);
+    document.getElementById('zoneName').textContent = zone.label;
+    document.getElementById('zoneRate').textContent = zone.rate + ' руб/км';
+    document.getElementById('zoneMin').textContent  = fmt(zone.minCost);
+  } else {
+    document.getElementById('zoneName').textContent = '—';
+    document.getElementById('zoneRate').textContent = '—';
+    document.getElementById('zoneMin').textContent  = '—';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ОСНОВНОЙ РАСЧЁТ
+══════════════════════════════════════════════════════════════════ */
+function calculate() {
+  const km         = +document.getElementById('distance').value  || 0;
+  const weightTons = +document.getElementById('weight').value    || 0;
+  const len        = +document.getElementById('len').value       || 0;
+  const wid        = +document.getElementById('wid').value       || 0;
+  const hei        = +document.getElementById('hei').value       || 0;
+  const routeType  = document.getElementById('routeType').value;
+  const bodyType   = document.getElementById('bodyType').value;
+  const cargoClass = document.getElementById('cargoClass').value;
+  const loadSide   = document.getElementById('loadSide').checked;
+  const loadTop    = document.getElementById('loadTop').checked;
+
+  if (km <= 0 || weightTons <= 0) {
+    alert('Укажите расстояние и вес груза');
+    return;
+  }
+
+  /* 1. ОПРЕДЕЛЯЕМ РАСЧЁТНЫЙ ВЕС (больший из фактического и объёмного) */
+  const vol = (len > 0 && wid > 0 && hei > 0) ? len * wid * hei : 0;
+  const volWeightTons = vol > 0 ? (vol * T.VOL_DENSITY) / 1000 : 0;
+  const calcWeight = Math.max(weightTons, volWeightTons);
+  const usesVol = vol > 0 && volWeightTons > weightTons;
+
+  /* 2. ЗОНА и базовая ставка */
+  const zone = getZone(km);
+  const basePerKm = zone.rate;
+
+  /* 3. БАЗОВАЯ СТОИМОСТЬ = ставка × расстояние */
+  const baseCost = basePerKm * km;
+
+  /* 4. МИНИМАЛЬНАЯ СТОИМОСТЬ РЕЙСА */
+  const minCost = zone.minCost;
+
+  /* 5. ПОПРАВКА НА ВЕС */
+  const weightMult = getWeightMult(calcWeight);
+  const afterWeight = Math.max(baseCost * weightMult, minCost);
+
+  /* 6. КЛАСС ГРУЗА */
+  const classMult = T.CARGO_CLASS[cargoClass] || 1.0;
+  const afterClass = afterWeight * classMult;
+
+  /* 7. КУЗОВ */
+  const bodyCo = T.BODY[bodyType] || 1.0;
+
+  /* 8. ЗАГРУЗКА */
+  let loadAdd = 0;
+  if (loadSide) loadAdd = Math.max(loadAdd, T.LOAD.side);
+  if (loadTop)  loadAdd = Math.max(loadAdd, T.LOAD.top);
+  const loadCo = 1.0 + loadAdd;
+
+  /* 9. СЕБЕСТОИМОСТЬ ДО СНГ */
+  const costPreSng = afterClass * bodyCo * loadCo;
+
+  /* 10. НАДБАВКА СНГ */
+  const sngMult = T.SNG[routeType] || 1.0;
+  const totalCost = costPreSng * sngMult;
+
+  /* 11. РЫНОЧНАЯ ЦЕНА (Деловые Линии + корпоративная наценка) */
+  const priceMarket  = totalCost * T.MARKET_MARKUP;
+
+  /* 12. ЦЕЛЕВАЯ ЦЕНА (что должен найти наш логист у частника) */
+  const priceTarget  = priceMarket * T.NIKARIN_TARGET;
+
+  /* 13. КРАСНАЯ ЛИНИЯ */
+  const priceCeiling = priceTarget * T.CEILING_MULT;
+
+  /* 14. ЭКОНОМИЯ */
+  const economy = priceMarket - priceTarget;
+  const economyPct = Math.round((economy / priceMarket) * 100);
+
+  /* ── ЗАПОЛНЯЕМ ИНТЕРФЕЙС ── */
+  const routeNames = { rf:'Россия', kz:'Казахстан', kg:'Киргизия/Узб.', by:'Беларусь' };
+  const bodyNames  = { tent:'Тент', board:'Борт', isotherm:'Изотерм', refrig:'Рефриж.', lowbed:'Трал' };
+  const loads = [];
+  if (document.getElementById('loadRear').checked) loads.push('Задняя');
+  if (loadSide) loads.push('Боковая');
+  if (loadTop)  loads.push('Верхняя');
+  if (!loads.length) loads.push('Задняя');
+
+  document.getElementById('pMarket').textContent  = fmtShort(priceMarket);
+  document.getElementById('uMarket').textContent  = 'руб.';
+  document.getElementById('pTarget').textContent  = fmtShort(priceTarget);
+  document.getElementById('uTarget').textContent  = 'руб. · Target Price';
+  document.getElementById('pCeiling').textContent = fmtShort(priceCeiling);
+  document.getElementById('uCeiling').textContent = 'руб. · Ceiling Price';
+
+  document.getElementById('pDistance').textContent = km.toLocaleString('ru-RU') + ' км';
+  document.getElementById('pWeight').textContent   = weightTons + ' т' +
+    (usesVol ? ` (объём: ${vol.toFixed(1)} м³)` : vol > 0 ? ` / ${vol.toFixed(1)} м³` : '');
+  document.getElementById('pZone').textContent     = zone.label.split('(')[0].trim() + ' · ' + routeNames[routeType];
+  document.getElementById('pBody').textContent     = bodyNames[bodyType] + ' / ' + loads.join('+');
+
+  // Детализация
+  document.getElementById('dBase').textContent    = fmt(baseCost) + ` (${basePerKm}₽/км × ${km}км)`;
+  document.getElementById('dMin').textContent     = fmt(minCost) + (baseCost < minCost ? ' ← применён' : ' (не применён)');
+  document.getElementById('dWeight').textContent  = `×${weightMult.toFixed(2)} (${calcWeight.toFixed(2)}т${usesVol ? ' объёмный' : ''})`;
+  document.getElementById('dBody').textContent    = `×${bodyCo.toFixed(2)} кузов, ×${loadCo.toFixed(2)} загрузка`;
+  document.getElementById('dSng').textContent     = sngMult > 1 ? `×${sngMult.toFixed(2)} (+${Math.round((sngMult-1)*100)}%)` : 'нет (РФ)';
+  document.getElementById('dCost').textContent    = fmt(totalCost);
+  document.getElementById('dMarket').textContent  = `+${Math.round((T.MARKET_MARKUP-1)*100)}% = ${fmt(priceMarket)}`;
+  document.getElementById('dNikarin').textContent = `−${economyPct}% = ${fmt(priceTarget)}`;
+
+  // Экономия
+  document.getElementById('economyVal').textContent = '−' + fmt(economy) + '  (−' + economyPct + '%)';
+
+  // Прогресс-бар
+  const maxVal     = priceMarket * 1.06;
+  const targetPct  = (priceTarget  / maxVal) * 100;
+  const ceilingPct = (priceCeiling / maxVal) * 100;
+  const marketPct  = (priceMarket  / maxVal) * 100;
+
+  document.getElementById('barMarket').style.width = marketPct  + '%';
+  document.getElementById('barTrade').style.left   = targetPct  + '%';
+  document.getElementById('barTrade').style.width  = (ceilingPct - targetPct) + '%';
+  document.getElementById('bLabelT').textContent = '↑ ' + fmtShort(priceTarget) + ' ₽';
+  document.getElementById('bLabelC').textContent = '↑ ' + fmtShort(priceCeiling) + ' ₽';
+  document.getElementById('bLabelM').textContent =        fmtShort(priceMarket)  + ' ₽';
+
+  // Показать результаты
+  const res = document.getElementById('results');
+  res.classList.add('visible');
+
+  // Сброс анимаций
+  document.querySelectorAll('.anim').forEach(el => {
+    el.style.animation = 'none';
+    void el.offsetHeight;
+    el.style.animation = '';
+  });
+
+  setTimeout(() => res.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   СБРОС
+══════════════════════════════════════════════════════════════════ */
+function reset() {
+  ['distance','weight','len','wid','hei'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('routeType').value  = 'rf';
+  document.getElementById('bodyType').value   = 'tent';
+  document.getElementById('cargoClass').value = '1';
+  document.getElementById('loadRear').checked = false;
+  document.getElementById('loadSide').checked = false;
+  document.getElementById('loadTop').checked  = false;
+  const vd = document.getElementById('volDisplay');
+  vd.textContent = 'не задан';
+  vd.classList.add('empty');
+  ['zoneName','zoneRate','zoneMin'].forEach(id => {
+    document.getElementById(id).textContent = '—';
+  });
+  document.getElementById('results').classList.remove('visible');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Enter → расчёт
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') calculate();
+});
+</script>
+</body>
+</html>
