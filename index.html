@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Калькулятор логистики — ПартнёрПромСнаб / НикАрин</title>
+<title>Калькулятор логистики v2.2 — ПартнёрПромСнаб / НикАрин</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════
-   СВЕТЛАЯ ТЕМА — ПартнёрПромСнаб / НикАрин
+   ПартнёрПромСнаб / НикАрин · v2.1
 ═══════════════════════════════════════════ */
 :root {
   --bg:         #F4F5F7;
@@ -61,7 +61,6 @@ body {
   padding: 0;
 }
 
-/* ─── SUBTLE PATTERN ─── */
 body::before {
   content: '';
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -74,10 +73,9 @@ body::before {
 ::-webkit-scrollbar-track { background: var(--bg3); }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 
-/* ─── LAYOUT ─── */
 .wrap {
   position: relative; z-index: 1;
-  max-width: 1000px; margin: 0 auto;
+  max-width: 1080px; margin: 0 auto;
   padding: 32px 20px 80px;
 }
 
@@ -138,7 +136,7 @@ body::before {
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
   margin-bottom: 16px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .card-head {
@@ -159,7 +157,6 @@ body::before {
 }
 .card-body { padding: 22px; }
 
-/* ─── FORM GRID ─── */
 .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
 .g4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; }
@@ -168,7 +165,7 @@ body::before {
 .divider { height: 1px; background: var(--border); margin: 18px 0; }
 
 /* ─── FIELD ─── */
-.field { display: flex; flex-direction: column; gap: 6px; }
+.field { display: flex; flex-direction: column; gap: 6px; position: relative; }
 
 .field-label {
   font-family: 'JetBrains Mono', monospace;
@@ -196,7 +193,6 @@ body::before {
 }
 .field input::placeholder { color: var(--text4); font-weight: 400; }
 
-/* SELECT */
 .field select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%237A8899' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -204,7 +200,11 @@ body::before {
   padding-right: 38px; cursor: pointer;
 }
 
-/* VOLUME DISPLAY */
+.field input:disabled, .field select:disabled {
+  background: var(--bg4); color: var(--text4);
+  cursor: not-allowed;
+}
+
 .vol-display {
   background: var(--bg3); border: 1.5px solid var(--border);
   padding: 11px 14px; min-height: 44px;
@@ -221,6 +221,178 @@ body::before {
   font-size: 9px; color: var(--text4); letter-spacing: 1px;
   margin-top: 2px;
 }
+
+/* ─── AUTOCOMPLETE ─── */
+.ac-wrap { position: relative; }
+.ac-input { position: relative; }
+.ac-list {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: #fff;
+  border: 1.5px solid var(--navy2);
+  box-shadow: var(--shadow-lg);
+  max-height: 280px; overflow-y: auto;
+  z-index: 50;
+  display: none;
+}
+.ac-list.open { display: block; }
+.ac-item {
+  padding: 10px 14px;
+  font-size: 13px; font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 10px;
+}
+.ac-item:last-child { border-bottom: none; }
+.ac-item:hover, .ac-item.active {
+  background: var(--navy-light);
+  color: var(--navy);
+}
+.ac-item .ac-flag {
+  font-size: 14px; flex-shrink: 0;
+}
+.ac-item .ac-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; color: var(--text3);
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+.ac-item.active .ac-meta { color: var(--gold); }
+.ac-item .ac-name { flex: 1; }
+.ac-item mark {
+  background: var(--gold-light); color: var(--gold);
+  padding: 1px 2px; font-weight: 700;
+}
+.ac-empty {
+  padding: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--text3);
+  text-align: center;
+}
+
+.ac-input input.has-value {
+  background: #fff;
+  border-color: var(--navy2);
+}
+
+/* ─── ROUTE BUILDER (geo flow) ─── */
+.geo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  position: relative;
+}
+.geo-col {
+  display: flex; flex-direction: column; gap: 14px;
+  background: var(--bg3);
+  border: 1.5px solid var(--border);
+  padding: 16px;
+  position: relative;
+}
+.geo-col.from { border-left: 3px solid var(--green2); }
+.geo-col.to   { border-left: 3px solid var(--red2); }
+
+.geo-col-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+}
+.geo-col.from .geo-col-title { color: var(--green); }
+.geo-col.to   .geo-col-title { color: var(--red); }
+
+.geo-col-title::before {
+  content: ''; width: 8px; height: 8px;
+  display: inline-block;
+}
+.geo-col.from .geo-col-title::before {
+  background: var(--green2);
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+.geo-col.to .geo-col-title::before {
+  background: var(--red2);
+  clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+}
+
+.geo-arrow {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 38px; height: 38px;
+  background: var(--navy);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 5;
+  box-shadow: var(--shadow);
+  clip-path: polygon(0% 35%, 60% 35%, 60% 0%, 100% 50%, 60% 100%, 60% 65%, 0% 65%);
+}
+.geo-arrow::after {
+  content: '';
+  width: 14px; height: 14px;
+}
+
+/* ─── DISTANCE BANNER ─── */
+.dist-banner {
+  margin-top: 16px;
+  padding: 14px 20px;
+  background: var(--gold-light);
+  border: 1.5px solid var(--gold-border);
+  border-left: 4px solid var(--gold);
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 10px;
+}
+.dist-banner.empty {
+  background: var(--bg3);
+  border-color: var(--border);
+  border-left-color: var(--border2);
+  opacity: 0.7;
+}
+.dist-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 600;
+  color: var(--gold); letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.dist-banner.empty .dist-label { color: var(--text3); }
+.dist-value {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 18px; font-weight: 700;
+  color: var(--gold);
+}
+.dist-banner.empty .dist-value { color: var(--text3); }
+.dist-detail {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--text3);
+}
+
+.dist-toggle {
+  margin-top: 14px;
+  display: flex; gap: 0;
+  background: var(--bg3);
+  border: 1.5px solid var(--border);
+  padding: 3px;
+}
+.dist-tab {
+  flex: 1; padding: 10px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--text3);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  border: none; background: transparent;
+}
+.dist-tab.active {
+  background: var(--navy); color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+.dist-tab:not(.active):hover { color: var(--navy); }
+
+.manual-km {
+  display: none;
+  margin-top: 14px;
+}
+.manual-km.visible { display: block; }
 
 /* ─── CHECKBOXES ─── */
 .checks-row { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 4px; }
@@ -253,7 +425,113 @@ body::before {
 }
 .chk-label input:checked ~ .chk-text { color: var(--navy); }
 
-/* ─── ZONE INFO BAR ─── */
+/* ─── WEIGHT INPUT WITH UNIT TOGGLE ─── */
+.weight-row {
+  display: flex; gap: 0;
+  align-items: stretch;
+}
+.weight-row input {
+  flex: 1;
+  border-right: none !important;
+}
+.weight-units {
+  display: flex; gap: 0;
+  background: var(--bg3);
+  border: 1.5px solid var(--border);
+  flex-shrink: 0;
+}
+.weight-unit-btn {
+  padding: 0 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase;
+  color: var(--text3);
+  background: transparent;
+  border: none; cursor: pointer;
+  transition: all 0.2s;
+  min-width: 50px;
+}
+.weight-unit-btn.active {
+  background: var(--navy); color: #fff;
+}
+.weight-unit-btn:not(.active):hover {
+  color: var(--navy);
+}
+
+/* ─── MODE BADGE (LTL/FTL) ─── */
+.mode-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  margin-left: 8px;
+}
+.mode-badge.ltl {
+  background: rgba(34, 160, 90, 0.12);
+  color: var(--green);
+  border: 1px solid var(--green-border);
+}
+.mode-badge.ftl {
+  background: rgba(26, 43, 74, 0.10);
+  color: var(--navy);
+  border: 1px solid var(--border2);
+}
+.mode-badge::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+}
+.mode-badge.ltl::before { background: var(--green2); }
+.mode-badge.ftl::before { background: var(--navy); }
+
+.mode-explainer {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--text3);
+  letter-spacing: 0.5px; line-height: 1.5;
+  margin-top: 10px; padding: 10px 14px;
+  background: var(--bg3);
+  border-left: 3px solid var(--text4);
+}
+.mode-explainer.ltl { border-left-color: var(--green2); }
+.mode-explainer.ftl { border-left-color: var(--navy); }
+.mode-explainer strong { color: var(--text2); }
+
+/* ─── ACTION BUTTONS ROW (PDF, etc.) ─── */
+.action-row {
+  display: flex; gap: 10px;
+  margin-top: 14px;
+}
+.action-row > * { flex: 1; }
+.btn-pdf {
+  padding: 12px;
+  background: var(--gold-light);
+  color: var(--gold);
+  border: 1.5px solid var(--gold-border); cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+  transition: all 0.2s;
+}
+.btn-pdf:hover {
+  background: var(--gold); color: #fff;
+  border-color: var(--gold);
+}
+
+/* ─── PRINT STYLES ─── */
+@media print {
+  body { background: #fff; }
+  body::before { display: none; }
+  .card-head, .header, .footer, .btn-calc, .btn-reset, .btn-swap,
+  .action-row, .dist-toggle, .manual-km, .checks-row,
+  .vol-display, .field-hint, .field-label,
+  .weight-units, .ac-list { display: none !important; }
+  .field input, .field select { border: none; background: transparent; padding: 0; font-size: 13px; }
+  .card { border: none; box-shadow: none; page-break-inside: avoid; margin-bottom: 12px; }
+  .card-body { padding: 8px 0; }
+  .results { display: block !important; }
+  .anim { opacity: 1 !important; animation: none !important; }
+}
+
+
 .zone-info {
   display: flex; gap: 8px; flex-wrap: wrap;
   margin-top: 14px; padding: 12px 16px;
@@ -293,6 +571,10 @@ body::before {
   transform: translateY(-1px);
 }
 .btn-calc:active { transform: translateY(0); box-shadow: var(--shadow-sm); }
+.btn-calc:disabled {
+  background: var(--border2); cursor: not-allowed;
+  transform: none; box-shadow: none;
+}
 
 .btn-reset {
   width: 100%; padding: 12px;
@@ -308,11 +590,26 @@ body::before {
   background: var(--navy-light);
 }
 
+.btn-swap {
+  width: 100%; padding: 10px;
+  background: var(--bg3); color: var(--text2);
+  border: 1.5px dashed var(--border2); cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  transition: all 0.2s;
+  margin-top: 14px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-swap:hover {
+  border-color: var(--navy); color: var(--navy);
+  background: var(--navy-light);
+}
+
 /* ─── RESULTS ─── */
 .results { display: none; }
 .results.visible { display: block; }
 
-/* THREE CARDS */
 .r-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -382,7 +679,6 @@ body::before {
   font-size: 28px; opacity: 0.08;
 }
 
-/* ─── PROGRESS BAR ─── */
 .bar-section {
   background: var(--surface);
   border: 1.5px solid var(--border);
@@ -426,13 +722,13 @@ body::before {
 .bar-l.green { color: var(--green); font-weight: 600; }
 .bar-l.red { color: var(--red); font-weight: 600; }
 
-/* ─── INFO PILLS ─── */
 .pills-row {
   display: flex; gap: 8px;
   margin-bottom: 10px;
+  flex-wrap: wrap;
 }
 .pill {
-  flex: 1;
+  flex: 1; min-width: 180px;
   background: var(--surface);
   border: 1.5px solid var(--border);
   box-shadow: var(--shadow-sm);
@@ -449,7 +745,6 @@ body::before {
   font-size: 13px; font-weight: 600; color: var(--navy);
 }
 
-/* ─── ECONOMY ─── */
 .economy {
   display: flex; align-items: center; justify-content: space-between;
   background: var(--gold-light);
@@ -467,7 +762,6 @@ body::before {
   font-size: 20px; font-weight: 700; color: var(--gold);
 }
 
-/* ─── BREAKDOWN ─── */
 .breakdown {
   background: var(--surface);
   border: 1.5px solid var(--border);
@@ -492,7 +786,6 @@ body::before {
 .bk-val.pos { color: var(--green); }
 .bk-val.neg { color: var(--red); }
 
-/* ─── FOOTER ─── */
 .footer {
   margin-top: 40px; padding-top: 20px;
   border-top: 1px solid var(--border);
@@ -504,7 +797,6 @@ body::before {
   font-size: 9px; color: var(--text4); letter-spacing: 1px;
 }
 
-/* ─── ANIMATIONS ─── */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -516,7 +808,13 @@ body::before {
 .anim-4 { animation-delay: 0.26s; opacity: 0; }
 .anim-5 { animation-delay: 0.33s; opacity: 0; }
 
-/* ─── RESPONSIVE ─── */
+@media (max-width: 820px) {
+  .geo-grid { grid-template-columns: 1fr; }
+  .geo-arrow {
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+}
 @media (max-width: 720px) {
   .r-grid { grid-template-columns: 1fr; }
   .g2, .g3, .g4 { grid-template-columns: 1fr; }
@@ -531,40 +829,129 @@ body::before {
 <body>
 <div class="wrap">
 
-<!-- HEADER -->
 <header class="header">
   <div class="header-left">
     <div class="logo-mark"></div>
     <div>
       <div class="header-title">Калькулятор логистики</div>
-      <div class="header-sub">ПартнёрПромСнаб · НикАрин · Внутренний инструмент</div>
+      <div class="header-sub">ПартнёрПромСнаб · НикАрин · v2.2 — LTL/FTL · Деловые линии</div>
     </div>
   </div>
-  <div class="header-badge">Версия 2.0</div>
+  <div class="header-badge">v 2.2</div>
 </header>
 
 <!-- БЛОК 1: МАРШРУТ -->
 <div class="card">
   <div class="card-head">
     <span class="card-num">01 //</span>
-    <span class="card-title">Параметры маршрута</span>
+    <span class="card-title">Маршрут перевозки</span>
   </div>
   <div class="card-body">
-    <div class="g2">
-      <div class="field">
-        <label class="field-label">Расстояние</label>
-        <input type="number" id="distance" min="1" placeholder="например, 860" oninput="onInput()">
-        <div class="field-hint">КИЛОМЕТРЫ (по карте)</div>
+
+    <!-- Geo-flow: From / To -->
+    <div class="geo-grid">
+
+      <!-- ОТКУДА -->
+      <div class="geo-col from">
+        <div class="geo-col-title">Откуда</div>
+
+        <div class="field ac-wrap">
+          <label class="field-label">Страна</label>
+          <div class="ac-input">
+            <input type="text" id="fromCountry" placeholder="Введите или выберите..." autocomplete="off"
+                   data-side="from" data-level="country">
+            <div class="ac-list" id="fromCountryList"></div>
+          </div>
+        </div>
+
+        <div class="field ac-wrap">
+          <label class="field-label">Регион</label>
+          <div class="ac-input">
+            <input type="text" id="fromRegion" placeholder="Сначала выберите страну" autocomplete="off"
+                   data-side="from" data-level="region" disabled>
+            <div class="ac-list" id="fromRegionList"></div>
+          </div>
+        </div>
+
+        <div class="field ac-wrap">
+          <label class="field-label">Город</label>
+          <div class="ac-input">
+            <input type="text" id="fromCity" placeholder="Сначала выберите регион" autocomplete="off"
+                   data-side="from" data-level="city" disabled>
+            <div class="ac-list" id="fromCityList"></div>
+          </div>
+        </div>
       </div>
-      <div class="field">
-        <label class="field-label">Тип маршрута</label>
-        <select id="routeType" onchange="onInput()">
-          <option value="rf">Россия (РФ)</option>
-          <option value="kz">Казахстан (СНГ)</option>
-          <option value="kg">Кыргызстан / Узбекистан (СНГ)</option>
-          <option value="by">Беларусь / Прочее СНГ</option>
-        </select>
-        <div class="field-hint">ВЛИЯЕТ НА ТАРИФ (+20-30% СНГ)</div>
+
+      <!-- КУДА -->
+      <div class="geo-col to">
+        <div class="geo-col-title">Куда</div>
+
+        <div class="field ac-wrap">
+          <label class="field-label">Страна</label>
+          <div class="ac-input">
+            <input type="text" id="toCountry" placeholder="Введите или выберите..." autocomplete="off"
+                   data-side="to" data-level="country">
+            <div class="ac-list" id="toCountryList"></div>
+          </div>
+        </div>
+
+        <div class="field ac-wrap">
+          <label class="field-label">Регион</label>
+          <div class="ac-input">
+            <input type="text" id="toRegion" placeholder="Сначала выберите страну" autocomplete="off"
+                   data-side="to" data-level="region" disabled>
+            <div class="ac-list" id="toRegionList"></div>
+          </div>
+        </div>
+
+        <div class="field ac-wrap">
+          <label class="field-label">Город</label>
+          <div class="ac-input">
+            <input type="text" id="toCity" placeholder="Сначала выберите регион" autocomplete="off"
+                   data-side="to" data-level="city" disabled>
+            <div class="ac-list" id="toCityList"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="geo-arrow"></div>
+    </div>
+
+    <button class="btn-swap" onclick="swapRoute()">⇅ Поменять «Откуда» и «Куда» местами</button>
+
+    <!-- Distance result banner -->
+    <div class="dist-banner empty" id="distBanner">
+      <div>
+        <div class="dist-label" id="distLabel">Расстояние не определено</div>
+        <div class="dist-detail" id="distDetail">Выберите города отправления и назначения</div>
+      </div>
+      <div class="dist-value" id="distValue">— км</div>
+    </div>
+
+    <!-- Toggle: автоматически по карте / вручную -->
+    <div class="dist-toggle">
+      <button class="dist-tab active" id="tabAuto" onclick="switchTab('auto')">Авто (по координатам)</button>
+      <button class="dist-tab" id="tabManual" onclick="switchTab('manual')">Вручную (свой км)</button>
+    </div>
+
+    <div class="manual-km" id="manualKm">
+      <div class="g2">
+        <div class="field">
+          <label class="field-label">Расстояние вручную</label>
+          <input type="number" id="manualDistance" min="1" placeholder="например, 860" oninput="updateZoneInfo()">
+          <div class="field-hint">КИЛОМЕТРЫ — переопределит авторасчёт</div>
+        </div>
+        <div class="field">
+          <label class="field-label">Тип маршрута (если не выбраны страны)</label>
+          <select id="manualRouteType" onchange="updateZoneInfo()">
+            <option value="rf">Россия (РФ)</option>
+            <option value="kz">Казахстан (СНГ)</option>
+            <option value="kg">Кыргызстан / Узбекистан (СНГ)</option>
+            <option value="by">Беларусь / Прочее СНГ</option>
+          </select>
+          <div class="field-hint">ВЛИЯЕТ НА НАДБАВКУ СНГ</div>
+        </div>
       </div>
     </div>
 
@@ -573,6 +960,7 @@ body::before {
       <span class="zone-chip">Зона: <span id="zoneName">—</span></span>
       <span class="zone-chip">Базовая ставка: <span id="zoneRate">—</span></span>
       <span class="zone-chip">Мин. стоимость: <span id="zoneMin">—</span></span>
+      <span class="zone-chip">Маршрут: <span id="zoneSng">—</span></span>
     </div>
   </div>
 </div>
@@ -587,8 +975,14 @@ body::before {
     <div class="g2">
       <div class="field">
         <label class="field-label">Вес груза</label>
-        <input type="number" id="weight" min="0.01" step="0.1" placeholder="например, 1.4" oninput="onInput()">
-        <div class="field-hint">ТОННЫ (1 т = 1000 кг)</div>
+        <div class="weight-row">
+          <input type="number" id="weight" min="0.01" step="0.01" placeholder="например, 300 или 1.4" oninput="onInput()">
+          <div class="weight-units">
+            <button type="button" class="weight-unit-btn" id="unitKg"  onclick="setWeightUnit('kg')">кг</button>
+            <button type="button" class="weight-unit-btn active" id="unitT"   onclick="setWeightUnit('t')">т</button>
+          </div>
+        </div>
+        <div class="field-hint">ВЫБЕРИТЕ ЕДИНИЦУ ИЗМЕРЕНИЯ — КГ ИЛИ ТОННЫ</div>
       </div>
       <div class="field">
         <label class="field-label">Класс груза</label>
@@ -671,19 +1065,22 @@ body::before {
   </div>
 </div>
 
-<!-- КНОПКА -->
 <button class="btn-calc" onclick="calculate()">→ Рассчитать стоимость перевозки</button>
 
 <!-- РЕЗУЛЬТАТЫ -->
 <section class="results" id="results">
 
+  <div class="mode-explainer" id="modeExplainer" style="display:none;">
+    <strong>Режим расчёта: </strong><span id="modeText">—</span>
+  </div>
+
   <div class="r-grid">
     <div class="r-card market anim anim-1">
       <div class="r-icon">🏢</div>
-      <div class="r-tag">// Рыночная цена</div>
-      <div class="r-label">Цена крупных ТК и корпораций.<br>Ориентир «ленивого» заказчика.</div>
+      <div class="r-tag">// ≈ Деловые линии / ТК</div>
+      <div class="r-label">Цена крупных ТК — ориентир,<br>сколько платит «ленивый» клиент.</div>
       <div class="r-price" id="pMarket">—</div>
-      <div class="r-unit" id="uMarket">руб.</div>
+      <div class="r-unit" id="uMarket">руб. · Market Price</div>
     </div>
 
     <div class="r-card target anim anim-2">
@@ -703,7 +1100,6 @@ body::before {
     </div>
   </div>
 
-  <!-- ПРОГРЕСС-БАР ЗОНА ТОРГА -->
   <div class="bar-section anim anim-4">
     <div class="bar-title">// Зона торга логиста — от целевой до красной линии</div>
     <div class="bar-track">
@@ -718,8 +1114,11 @@ body::before {
     </div>
   </div>
 
-  <!-- ИНФО-ПИЛЛЫ -->
   <div class="pills-row anim anim-4">
+    <div class="pill">
+      <span class="pill-label">Маршрут</span>
+      <span class="pill-val" id="pRoute">—</span>
+    </div>
     <div class="pill">
       <span class="pill-label">Расстояние</span>
       <span class="pill-val" id="pDistance">—</span>
@@ -729,16 +1128,11 @@ body::before {
       <span class="pill-val" id="pWeight">—</span>
     </div>
     <div class="pill">
-      <span class="pill-label">Зона / Тип</span>
-      <span class="pill-val" id="pZone">—</span>
-    </div>
-    <div class="pill">
       <span class="pill-label">Кузов / Загрузка</span>
       <span class="pill-val" id="pBody">—</span>
     </div>
   </div>
 
-  <!-- ДЕТАЛИЗАЦИЯ -->
   <div class="breakdown anim anim-5">
     <div class="breakdown-title">// Детализация расчёта</div>
     <div class="bk-row">
@@ -775,43 +1169,598 @@ body::before {
     </div>
   </div>
 
-  <!-- ЭКОНОМИЯ -->
   <div class="economy anim anim-5">
     <span class="economy-label">⬡ Экономия НикАрин (vs рыночная цена)</span>
     <span class="economy-val" id="economyVal">—</span>
+  </div>
+
+  <div class="action-row">
+    <button class="btn-pdf" onclick="generateKP()">📄 Сформировать КП для клиента</button>
+    <button class="btn-pdf" onclick="window.print()">🖨 Печать / Сохранить PDF</button>
   </div>
 
   <button class="btn-reset" onclick="reset()">↩ Новый расчёт</button>
 
 </section>
 
-<!-- FOOTER -->
 <footer class="footer">
   <span class="footer-text">НикАрин · ПартнёрПромСнаб · г. Челябинск</span>
-  <span class="footer-text">Внутренний инструмент · Только для сотрудников</span>
+  <span class="footer-text">Внутренний инструмент · v2.2 · LTL+FTL · Только для сотрудников</span>
 </footer>
 
-</div><!-- /wrap -->
+</div>
 
 <script>
 /* ╔══════════════════════════════════════════════════════════════════╗
-   ║          МАТЕМАТИЧЕСКОЕ ЯДРО — ТАРИФНАЯ СЕТКА v2.0              ║
-   ║                                                                  ║
-   ║  Калиброван по реальным данным Excel (647 перевозок,             ║
-   ║  июнь 2023 – 2025) и методологии Деловых Линий (LTL).           ║
-   ║                                                                  ║
-   ║  Все коэффициенты вынесены — можно менять без трогания кода.     ║
+   ║  КАЛЬКУЛЯТОР ЛОГИСТИКИ v2.1                                      ║
+   ║  Добавлено: геозоны (страна → регион → город), автоопределение   ║
+   ║  расстояния по координатам (формула гаверсинусов × 1.25).        ║
    ╚══════════════════════════════════════════════════════════════════╝ */
 
-const T = {
+/* ══════════════════════════════════════════════════════════════════
+   ГЕО-БАЗА: СНГ
+   Структура: countries[code] = { name, flag, sngCode, regions: [...] }
+   regions[i] = { name, cities: [{ name, lat, lon, isCapital }] }
+   sngCode: 'rf' | 'kz' | 'kg' | 'by' — для надбавки СНГ
+══════════════════════════════════════════════════════════════════ */
 
-  /* ── ЗОНЫ РАССТОЯНИЙ ──────────────────────────────────────────────
-     Базовая ставка руб/км откалибрована по Excel-данным.
-     Методология Деловых Линий: ставка падает с расстоянием,
-     но добавляется минимальная стоимость рейса.
-  ────────────────────────────────────────────────────────────────── */
+const GEO = {
+  RU: {
+    name: 'Россия',
+    flag: '🇷🇺',
+    sngCode: 'rf',
+    regions: [
+      { name: 'Алтайский край', cities: [
+        { name: 'Барнаул', lat: 53.348, lon: 83.779, isCapital: true },
+        { name: 'Бийск', lat: 52.541, lon: 85.219 },
+        { name: 'Рубцовск', lat: 51.510, lon: 81.207 }
+      ]},
+      { name: 'Архангельская область', cities: [
+        { name: 'Архангельск', lat: 64.539, lon: 40.518, isCapital: true },
+        { name: 'Северодвинск', lat: 64.567, lon: 39.823 }
+      ]},
+      { name: 'Башкортостан', cities: [
+        { name: 'Уфа', lat: 54.735, lon: 55.958, isCapital: true },
+        { name: 'Стерлитамак', lat: 53.630, lon: 55.951 },
+        { name: 'Салават', lat: 53.361, lon: 55.928 },
+        { name: 'Нефтекамск', lat: 56.090, lon: 54.265 }
+      ]},
+      { name: 'Белгородская область', cities: [
+        { name: 'Белгород', lat: 50.595, lon: 36.587, isCapital: true },
+        { name: 'Старый Оскол', lat: 51.296, lon: 37.836 }
+      ]},
+      { name: 'Брянская область', cities: [
+        { name: 'Брянск', lat: 53.243, lon: 34.364, isCapital: true }
+      ]},
+      { name: 'Бурятия', cities: [
+        { name: 'Улан-Удэ', lat: 51.834, lon: 107.585, isCapital: true }
+      ]},
+      { name: 'Владимирская область', cities: [
+        { name: 'Владимир', lat: 56.129, lon: 40.406, isCapital: true },
+        { name: 'Ковров', lat: 56.357, lon: 41.319 },
+        { name: 'Муром', lat: 55.575, lon: 42.052 }
+      ]},
+      { name: 'Волгоградская область', cities: [
+        { name: 'Волгоград', lat: 48.708, lon: 44.513, isCapital: true },
+        { name: 'Волжский', lat: 48.785, lon: 44.776 },
+        { name: 'Камышин', lat: 50.076, lon: 45.398 }
+      ]},
+      { name: 'Вологодская область', cities: [
+        { name: 'Вологда', lat: 59.220, lon: 39.891, isCapital: true },
+        { name: 'Череповец', lat: 59.122, lon: 37.903 }
+      ]},
+      { name: 'Воронежская область', cities: [
+        { name: 'Воронеж', lat: 51.660, lon: 39.200, isCapital: true }
+      ]},
+      { name: 'Дагестан', cities: [
+        { name: 'Махачкала', lat: 42.984, lon: 47.504, isCapital: true },
+        { name: 'Дербент', lat: 42.058, lon: 48.291 }
+      ]},
+      { name: 'Ивановская область', cities: [
+        { name: 'Иваново', lat: 56.999, lon: 40.974, isCapital: true }
+      ]},
+      { name: 'Иркутская область', cities: [
+        { name: 'Иркутск', lat: 52.290, lon: 104.281, isCapital: true },
+        { name: 'Братск', lat: 56.151, lon: 101.634 },
+        { name: 'Ангарск', lat: 52.544, lon: 103.888 }
+      ]},
+      { name: 'Калининградская область', cities: [
+        { name: 'Калининград', lat: 54.710, lon: 20.452, isCapital: true }
+      ]},
+      { name: 'Калужская область', cities: [
+        { name: 'Калуга', lat: 54.513, lon: 36.262, isCapital: true },
+        { name: 'Обнинск', lat: 55.099, lon: 36.611 }
+      ]},
+      { name: 'Карелия', cities: [
+        { name: 'Петрозаводск', lat: 61.785, lon: 34.347, isCapital: true }
+      ]},
+      { name: 'Кемеровская область', cities: [
+        { name: 'Кемерово', lat: 55.355, lon: 86.087, isCapital: true },
+        { name: 'Новокузнецк', lat: 53.787, lon: 87.155 },
+        { name: 'Прокопьевск', lat: 53.882, lon: 86.713 }
+      ]},
+      { name: 'Кировская область', cities: [
+        { name: 'Киров', lat: 58.604, lon: 49.668, isCapital: true }
+      ]},
+      { name: 'Коми', cities: [
+        { name: 'Сыктывкар', lat: 61.668, lon: 50.836, isCapital: true },
+        { name: 'Ухта', lat: 63.561, lon: 53.683 }
+      ]},
+      { name: 'Костромская область', cities: [
+        { name: 'Кострома', lat: 57.768, lon: 40.927, isCapital: true }
+      ]},
+      { name: 'Краснодарский край', cities: [
+        { name: 'Краснодар', lat: 45.035, lon: 38.975, isCapital: true },
+        { name: 'Сочи', lat: 43.585, lon: 39.723 },
+        { name: 'Новороссийск', lat: 44.724, lon: 37.769 },
+        { name: 'Армавир', lat: 44.989, lon: 41.124 }
+      ]},
+      { name: 'Красноярский край', cities: [
+        { name: 'Красноярск', lat: 56.010, lon: 92.853, isCapital: true },
+        { name: 'Норильск', lat: 69.349, lon: 88.201 },
+        { name: 'Ачинск', lat: 56.269, lon: 90.499 }
+      ]},
+      { name: 'Курганская область', cities: [
+        { name: 'Курган', lat: 55.451, lon: 65.341, isCapital: true }
+      ]},
+      { name: 'Курская область', cities: [
+        { name: 'Курск', lat: 51.730, lon: 36.193, isCapital: true }
+      ]},
+      { name: 'Ленинградская область', cities: [
+        { name: 'Гатчина', lat: 59.572, lon: 30.128 },
+        { name: 'Выборг', lat: 60.710, lon: 28.752 }
+      ]},
+      { name: 'Липецкая область', cities: [
+        { name: 'Липецк', lat: 52.609, lon: 39.599, isCapital: true }
+      ]},
+      { name: 'Магаданская область', cities: [
+        { name: 'Магадан', lat: 59.561, lon: 150.802, isCapital: true }
+      ]},
+      { name: 'Москва (город)', cities: [
+        { name: 'Москва', lat: 55.755, lon: 37.617, isCapital: true }
+      ]},
+      { name: 'Московская область', cities: [
+        { name: 'Балашиха', lat: 55.806, lon: 37.957 },
+        { name: 'Подольск', lat: 55.431, lon: 37.546 },
+        { name: 'Химки', lat: 55.890, lon: 37.430 },
+        { name: 'Мытищи', lat: 55.910, lon: 37.736 },
+        { name: 'Люберцы', lat: 55.676, lon: 37.901 },
+        { name: 'Электросталь', lat: 55.788, lon: 38.451 },
+        { name: 'Коломна', lat: 55.095, lon: 38.764 }
+      ]},
+      { name: 'Мурманская область', cities: [
+        { name: 'Мурманск', lat: 68.969, lon: 33.075, isCapital: true }
+      ]},
+      { name: 'Нижегородская область', cities: [
+        { name: 'Нижний Новгород', lat: 56.296, lon: 43.936, isCapital: true },
+        { name: 'Дзержинск', lat: 56.238, lon: 43.464 },
+        { name: 'Арзамас', lat: 55.394, lon: 43.840 }
+      ]},
+      { name: 'Новгородская область', cities: [
+        { name: 'Великий Новгород', lat: 58.521, lon: 31.275, isCapital: true }
+      ]},
+      { name: 'Новосибирская область', cities: [
+        { name: 'Новосибирск', lat: 55.030, lon: 82.920, isCapital: true },
+        { name: 'Бердск', lat: 54.762, lon: 83.099 },
+        { name: 'Искитим', lat: 54.642, lon: 83.305 }
+      ]},
+      { name: 'Омская область', cities: [
+        { name: 'Омск', lat: 54.989, lon: 73.368, isCapital: true }
+      ]},
+      { name: 'Оренбургская область', cities: [
+        { name: 'Оренбург', lat: 51.768, lon: 55.097, isCapital: true },
+        { name: 'Орск', lat: 51.229, lon: 58.575 }
+      ]},
+      { name: 'Орловская область', cities: [
+        { name: 'Орёл', lat: 52.967, lon: 36.069, isCapital: true }
+      ]},
+      { name: 'Пензенская область', cities: [
+        { name: 'Пенза', lat: 53.195, lon: 45.018, isCapital: true }
+      ]},
+      { name: 'Пермский край', cities: [
+        { name: 'Пермь', lat: 58.010, lon: 56.249, isCapital: true },
+        { name: 'Березники', lat: 59.412, lon: 56.793 },
+        { name: 'Соликамск', lat: 59.654, lon: 56.770 }
+      ]},
+      { name: 'Приморский край', cities: [
+        { name: 'Владивосток', lat: 43.115, lon: 131.886, isCapital: true },
+        { name: 'Уссурийск', lat: 43.797, lon: 131.951 },
+        { name: 'Находка', lat: 42.823, lon: 132.881 }
+      ]},
+      { name: 'Псковская область', cities: [
+        { name: 'Псков', lat: 57.819, lon: 28.331, isCapital: true }
+      ]},
+      { name: 'Ростовская область', cities: [
+        { name: 'Ростов-на-Дону', lat: 47.236, lon: 39.701, isCapital: true },
+        { name: 'Таганрог', lat: 47.221, lon: 38.914 },
+        { name: 'Шахты', lat: 47.708, lon: 40.215 },
+        { name: 'Волгодонск', lat: 47.516, lon: 42.183 }
+      ]},
+      { name: 'Рязанская область', cities: [
+        { name: 'Рязань', lat: 54.625, lon: 39.741, isCapital: true }
+      ]},
+      { name: 'Самарская область', cities: [
+        { name: 'Самара', lat: 53.196, lon: 50.101, isCapital: true },
+        { name: 'Тольятти', lat: 53.508, lon: 49.420 },
+        { name: 'Сызрань', lat: 53.157, lon: 48.474 }
+      ]},
+      { name: 'Санкт-Петербург (город)', cities: [
+        { name: 'Санкт-Петербург', lat: 59.939, lon: 30.316, isCapital: true }
+      ]},
+      { name: 'Саратовская область', cities: [
+        { name: 'Саратов', lat: 51.534, lon: 46.034, isCapital: true },
+        { name: 'Энгельс', lat: 51.482, lon: 46.118 },
+        { name: 'Балаково', lat: 52.025, lon: 47.799 }
+      ]},
+      { name: 'Сахалинская область', cities: [
+        { name: 'Южно-Сахалинск', lat: 46.959, lon: 142.738, isCapital: true }
+      ]},
+      { name: 'Свердловская область', cities: [
+        { name: 'Екатеринбург', lat: 56.838, lon: 60.605, isCapital: true },
+        { name: 'Нижний Тагил', lat: 57.911, lon: 59.969 },
+        { name: 'Каменск-Уральский', lat: 56.415, lon: 61.917 },
+        { name: 'Первоуральск', lat: 56.908, lon: 59.943 }
+      ]},
+      { name: 'Смоленская область', cities: [
+        { name: 'Смоленск', lat: 54.782, lon: 32.045, isCapital: true }
+      ]},
+      { name: 'Ставропольский край', cities: [
+        { name: 'Ставрополь', lat: 45.044, lon: 41.969, isCapital: true },
+        { name: 'Пятигорск', lat: 44.041, lon: 43.062 },
+        { name: 'Невинномысск', lat: 44.638, lon: 41.937 }
+      ]},
+      { name: 'Тамбовская область', cities: [
+        { name: 'Тамбов', lat: 52.722, lon: 41.452, isCapital: true }
+      ]},
+      { name: 'Татарстан', cities: [
+        { name: 'Казань', lat: 55.796, lon: 49.106, isCapital: true },
+        { name: 'Набережные Челны', lat: 55.730, lon: 52.412 },
+        { name: 'Нижнекамск', lat: 55.633, lon: 51.819 },
+        { name: 'Альметьевск', lat: 54.901, lon: 52.301 }
+      ]},
+      { name: 'Тверская область', cities: [
+        { name: 'Тверь', lat: 56.860, lon: 35.917, isCapital: true }
+      ]},
+      { name: 'Томская область', cities: [
+        { name: 'Томск', lat: 56.484, lon: 84.948, isCapital: true }
+      ]},
+      { name: 'Тульская область', cities: [
+        { name: 'Тула', lat: 54.193, lon: 37.617, isCapital: true },
+        { name: 'Новомосковск', lat: 54.012, lon: 38.288 }
+      ]},
+      { name: 'Тюменская область', cities: [
+        { name: 'Тюмень', lat: 57.153, lon: 65.534, isCapital: true },
+        { name: 'Тобольск', lat: 58.198, lon: 68.252 }
+      ]},
+      { name: 'Удмуртия', cities: [
+        { name: 'Ижевск', lat: 56.852, lon: 53.211, isCapital: true },
+        { name: 'Воткинск', lat: 57.052, lon: 53.987 }
+      ]},
+      { name: 'Ульяновская область', cities: [
+        { name: 'Ульяновск', lat: 54.314, lon: 48.404, isCapital: true },
+        { name: 'Димитровград', lat: 54.218, lon: 49.620 }
+      ]},
+      { name: 'Хабаровский край', cities: [
+        { name: 'Хабаровск', lat: 48.480, lon: 135.084, isCapital: true },
+        { name: 'Комсомольск-на-Амуре', lat: 50.550, lon: 137.011 }
+      ]},
+      { name: 'ХМАО — Югра', cities: [
+        { name: 'Ханты-Мансийск', lat: 61.003, lon: 69.019, isCapital: true },
+        { name: 'Сургут', lat: 61.254, lon: 73.396 },
+        { name: 'Нижневартовск', lat: 60.939, lon: 76.554 },
+        { name: 'Нефтеюганск', lat: 61.090, lon: 72.601 }
+      ]},
+      { name: 'Челябинская область', cities: [
+        { name: 'Челябинск', lat: 55.160, lon: 61.402, isCapital: true },
+        { name: 'Магнитогорск', lat: 53.408, lon: 58.985 },
+        { name: 'Златоуст', lat: 55.171, lon: 59.654 },
+        { name: 'Миасс', lat: 55.044, lon: 60.108 },
+        { name: 'Копейск', lat: 55.117, lon: 61.612 },
+        { name: 'Озёрск', lat: 55.762, lon: 60.715 }
+      ]},
+      { name: 'Чеченская республика', cities: [
+        { name: 'Грозный', lat: 43.317, lon: 45.694, isCapital: true }
+      ]},
+      { name: 'Чувашия', cities: [
+        { name: 'Чебоксары', lat: 56.146, lon: 47.250, isCapital: true },
+        { name: 'Новочебоксарск', lat: 56.114, lon: 47.479 }
+      ]},
+      { name: 'ЯНАО', cities: [
+        { name: 'Салехард', lat: 66.530, lon: 66.612, isCapital: true },
+        { name: 'Новый Уренгой', lat: 66.084, lon: 76.681 },
+        { name: 'Ноябрьск', lat: 63.198, lon: 75.450 }
+      ]},
+      { name: 'Якутия', cities: [
+        { name: 'Якутск', lat: 62.027, lon: 129.732, isCapital: true }
+      ]},
+      { name: 'Ярославская область', cities: [
+        { name: 'Ярославль', lat: 57.626, lon: 39.875, isCapital: true },
+        { name: 'Рыбинск', lat: 58.046, lon: 38.844 }
+      ]}
+    ]
+  },
+
+  KZ: {
+    name: 'Казахстан',
+    flag: '🇰🇿',
+    sngCode: 'kz',
+    regions: [
+      { name: 'Абайская область', cities: [
+        { name: 'Семей', lat: 50.421, lon: 80.262, isCapital: true }
+      ]},
+      { name: 'Акмолинская область', cities: [
+        { name: 'Кокшетау', lat: 53.295, lon: 69.397, isCapital: true },
+        { name: 'Степногорск', lat: 52.350, lon: 71.892 }
+      ]},
+      { name: 'Актюбинская область', cities: [
+        { name: 'Актобе', lat: 50.283, lon: 57.167, isCapital: true }
+      ]},
+      { name: 'Алматинская область', cities: [
+        { name: 'Талдыкорган', lat: 45.017, lon: 78.378, isCapital: true }
+      ]},
+      { name: 'Алматы (город)', cities: [
+        { name: 'Алматы', lat: 43.238, lon: 76.945, isCapital: true }
+      ]},
+      { name: 'Астана (город)', cities: [
+        { name: 'Астана', lat: 51.169, lon: 71.449, isCapital: true }
+      ]},
+      { name: 'Атырауская область', cities: [
+        { name: 'Атырау', lat: 47.117, lon: 51.917, isCapital: true }
+      ]},
+      { name: 'Восточно-Казахстанская область', cities: [
+        { name: 'Усть-Каменогорск', lat: 49.949, lon: 82.628, isCapital: true }
+      ]},
+      { name: 'Жамбылская область', cities: [
+        { name: 'Тараз', lat: 42.900, lon: 71.367, isCapital: true }
+      ]},
+      { name: 'Жетысуская область', cities: [
+        { name: 'Талдыкорган', lat: 45.017, lon: 78.378, isCapital: true }
+      ]},
+      { name: 'Западно-Казахстанская область', cities: [
+        { name: 'Уральск', lat: 51.230, lon: 51.367, isCapital: true }
+      ]},
+      { name: 'Карагандинская область', cities: [
+        { name: 'Караганда', lat: 49.806, lon: 73.085, isCapital: true },
+        { name: 'Темиртау', lat: 50.054, lon: 72.965 },
+        { name: 'Балхаш', lat: 46.844, lon: 74.997 }
+      ]},
+      { name: 'Костанайская область', cities: [
+        { name: 'Костанай', lat: 53.214, lon: 63.633, isCapital: true },
+        { name: 'Рудный', lat: 52.957, lon: 63.131 }
+      ]},
+      { name: 'Кызылординская область', cities: [
+        { name: 'Кызылорда', lat: 44.852, lon: 65.503, isCapital: true }
+      ]},
+      { name: 'Мангистауская область', cities: [
+        { name: 'Актау', lat: 43.650, lon: 51.158, isCapital: true },
+        { name: 'Жанаозен', lat: 43.339, lon: 52.860 }
+      ]},
+      { name: 'Павлодарская область', cities: [
+        { name: 'Павлодар', lat: 52.300, lon: 76.950, isCapital: true },
+        { name: 'Экибастуз', lat: 51.728, lon: 75.323 }
+      ]},
+      { name: 'Северо-Казахстанская область', cities: [
+        { name: 'Петропавловск', lat: 54.875, lon: 69.150, isCapital: true }
+      ]},
+      { name: 'Туркестанская область', cities: [
+        { name: 'Туркестан', lat: 43.297, lon: 68.255, isCapital: true },
+        { name: 'Шымкент', lat: 42.317, lon: 69.595 }
+      ]},
+      { name: 'Улытауская область', cities: [
+        { name: 'Жезказган', lat: 47.789, lon: 67.711, isCapital: true }
+      ]}
+    ]
+  },
+
+  BY: {
+    name: 'Беларусь',
+    flag: '🇧🇾',
+    sngCode: 'by',
+    regions: [
+      { name: 'Брестская область', cities: [
+        { name: 'Брест', lat: 52.097, lon: 23.734, isCapital: true },
+        { name: 'Барановичи', lat: 53.133, lon: 26.013 },
+        { name: 'Пинск', lat: 52.115, lon: 26.108 }
+      ]},
+      { name: 'Витебская область', cities: [
+        { name: 'Витебск', lat: 55.184, lon: 30.202, isCapital: true },
+        { name: 'Орша', lat: 54.510, lon: 30.426 }
+      ]},
+      { name: 'Гомельская область', cities: [
+        { name: 'Гомель', lat: 52.425, lon: 31.014, isCapital: true },
+        { name: 'Мозырь', lat: 52.046, lon: 29.245 }
+      ]},
+      { name: 'Гродненская область', cities: [
+        { name: 'Гродно', lat: 53.677, lon: 23.829, isCapital: true },
+        { name: 'Лида', lat: 53.890, lon: 25.298 }
+      ]},
+      { name: 'Минск (город)', cities: [
+        { name: 'Минск', lat: 53.902, lon: 27.561, isCapital: true }
+      ]},
+      { name: 'Минская область', cities: [
+        { name: 'Борисов', lat: 54.230, lon: 28.493 },
+        { name: 'Солигорск', lat: 52.792, lon: 27.541 },
+        { name: 'Молодечно', lat: 54.319, lon: 26.846 }
+      ]},
+      { name: 'Могилёвская область', cities: [
+        { name: 'Могилёв', lat: 53.901, lon: 30.332, isCapital: true },
+        { name: 'Бобруйск', lat: 53.135, lon: 29.226 }
+      ]}
+    ]
+  },
+
+  UZ: {
+    name: 'Узбекистан',
+    flag: '🇺🇿',
+    sngCode: 'kg',
+    regions: [
+      { name: 'Андижанская область', cities: [
+        { name: 'Андижан', lat: 40.783, lon: 72.350, isCapital: true }
+      ]},
+      { name: 'Бухарская область', cities: [
+        { name: 'Бухара', lat: 39.768, lon: 64.421, isCapital: true }
+      ]},
+      { name: 'Джизакская область', cities: [
+        { name: 'Джизак', lat: 40.115, lon: 67.842, isCapital: true }
+      ]},
+      { name: 'Кашкадарьинская область', cities: [
+        { name: 'Карши', lat: 38.853, lon: 65.797, isCapital: true }
+      ]},
+      { name: 'Навоийская область', cities: [
+        { name: 'Навои', lat: 40.084, lon: 65.379, isCapital: true },
+        { name: 'Зарафшан', lat: 41.566, lon: 64.187 }
+      ]},
+      { name: 'Наманганская область', cities: [
+        { name: 'Наманган', lat: 41.000, lon: 71.667, isCapital: true }
+      ]},
+      { name: 'Самаркандская область', cities: [
+        { name: 'Самарканд', lat: 39.654, lon: 66.959, isCapital: true }
+      ]},
+      { name: 'Сурхандарьинская область', cities: [
+        { name: 'Термез', lat: 37.224, lon: 67.278, isCapital: true }
+      ]},
+      { name: 'Сырдарьинская область', cities: [
+        { name: 'Гулистан', lat: 40.490, lon: 68.785, isCapital: true }
+      ]},
+      { name: 'Ташкент (город)', cities: [
+        { name: 'Ташкент', lat: 41.299, lon: 69.240, isCapital: true }
+      ]},
+      { name: 'Ташкентская область', cities: [
+        { name: 'Нурафшан', lat: 41.034, lon: 69.298, isCapital: true },
+        { name: 'Ангрен', lat: 41.014, lon: 70.144 },
+        { name: 'Алмалык', lat: 40.844, lon: 69.598 },
+        { name: 'Чирчик', lat: 41.469, lon: 69.580 }
+      ]},
+      { name: 'Ферганская область', cities: [
+        { name: 'Фергана', lat: 40.379, lon: 71.787, isCapital: true },
+        { name: 'Коканд', lat: 40.529, lon: 70.943 }
+      ]},
+      { name: 'Хорезмская область', cities: [
+        { name: 'Ургенч', lat: 41.550, lon: 60.633, isCapital: true },
+        { name: 'Хива', lat: 41.378, lon: 60.362 }
+      ]},
+      { name: 'Каракалпакстан', cities: [
+        { name: 'Нукус', lat: 42.453, lon: 59.610, isCapital: true }
+      ]}
+    ]
+  },
+
+  KG: {
+    name: 'Кыргызстан',
+    flag: '🇰🇬',
+    sngCode: 'kg',
+    regions: [
+      { name: 'Баткенская область', cities: [
+        { name: 'Баткен', lat: 40.062, lon: 70.819, isCapital: true }
+      ]},
+      { name: 'Бишкек (город)', cities: [
+        { name: 'Бишкек', lat: 42.874, lon: 74.612, isCapital: true }
+      ]},
+      { name: 'Джалал-Абадская область', cities: [
+        { name: 'Джалал-Абад', lat: 40.933, lon: 73.001, isCapital: true }
+      ]},
+      { name: 'Иссык-Кульская область', cities: [
+        { name: 'Каракол', lat: 42.488, lon: 78.394, isCapital: true }
+      ]},
+      { name: 'Нарынская область', cities: [
+        { name: 'Нарын', lat: 41.428, lon: 75.991, isCapital: true }
+      ]},
+      { name: 'Ошская область', cities: [
+        { name: 'Ош', lat: 40.514, lon: 72.804, isCapital: true }
+      ]},
+      { name: 'Таласская область', cities: [
+        { name: 'Талас', lat: 42.518, lon: 72.243, isCapital: true }
+      ]},
+      { name: 'Чуйская область', cities: [
+        { name: 'Токмок', lat: 42.842, lon: 75.300, isCapital: true }
+      ]}
+    ]
+  },
+
+  AM: {
+    name: 'Армения',
+    flag: '🇦🇲',
+    sngCode: 'by',
+    regions: [
+      { name: 'Ереван (город)', cities: [
+        { name: 'Ереван', lat: 40.179, lon: 44.499, isCapital: true }
+      ]},
+      { name: 'Гюмри', cities: [
+        { name: 'Гюмри', lat: 40.793, lon: 43.847, isCapital: true }
+      ]},
+      { name: 'Ванадзор', cities: [
+        { name: 'Ванадзор', lat: 40.812, lon: 44.494, isCapital: true }
+      ]}
+    ]
+  },
+
+  AZ: {
+    name: 'Азербайджан',
+    flag: '🇦🇿',
+    sngCode: 'by',
+    regions: [
+      { name: 'Баку (город)', cities: [
+        { name: 'Баку', lat: 40.409, lon: 49.867, isCapital: true }
+      ]},
+      { name: 'Гянджа', cities: [
+        { name: 'Гянджа', lat: 40.683, lon: 46.367, isCapital: true }
+      ]},
+      { name: 'Сумгаит', cities: [
+        { name: 'Сумгаит', lat: 40.589, lon: 49.668, isCapital: true }
+      ]}
+    ]
+  },
+
+  TJ: {
+    name: 'Таджикистан',
+    flag: '🇹🇯',
+    sngCode: 'kg',
+    regions: [
+      { name: 'Душанбе (город)', cities: [
+        { name: 'Душанбе', lat: 38.560, lon: 68.787, isCapital: true }
+      ]},
+      { name: 'Худжанд', cities: [
+        { name: 'Худжанд', lat: 40.282, lon: 69.621, isCapital: true }
+      ]},
+      { name: 'Куляб', cities: [
+        { name: 'Куляб', lat: 37.910, lon: 69.783, isCapital: true }
+      ]}
+    ]
+  },
+
+  MD: {
+    name: 'Молдова',
+    flag: '🇲🇩',
+    sngCode: 'by',
+    regions: [
+      { name: 'Кишинёв (город)', cities: [
+        { name: 'Кишинёв', lat: 47.011, lon: 28.864, isCapital: true }
+      ]},
+      { name: 'Бельцы', cities: [
+        { name: 'Бельцы', lat: 47.756, lon: 27.918, isCapital: true }
+      ]},
+      { name: 'Тирасполь', cities: [
+        { name: 'Тирасполь', lat: 46.838, lon: 29.643, isCapital: true }
+      ]}
+    ]
+  }
+};
+
+/* ══════════════════════════════════════════════════════════════════
+   ТАРИФНОЕ ЯДРО v2.2 — ДВУХРЕЖИМНАЯ МОДЕЛЬ
+   ═══════════════════════════════════════════════════════════════════
+   FTL (Full Truckload, отдельная машина): >1.5 т ИЛИ >3 м³
+     → классическая модель руб/км × коэффициенты (как было в v2.1)
+   LTL (Less than Truckload, сборный груз): ≤1.5 т И ≤3 м³
+     → модель руб/кг с дистанционным коэффициентом
+       Калибрована по ценам Деловых линий
+═══════════════════════════════════════════════════════════════════ */
+const T = {
+  /* ── ПОРОГ РЕЖИМА ── */
+  FTL_THRESHOLD: { weightTons: 1.5, volumeM3: 3.0 },
+
+  /* ── FTL: руб/км × ставки и коэффициенты ── */
   ZONES: [
-    // { до км, руб/км, мин.стоимость рейса (руб), метка }
     { max:   80, rate: 95,  minCost: 4500,  label: 'Пригород (<80 км)' },
     { max:  300, rate: 75,  minCost: 8000,  label: 'Ближняя (80–300 км)' },
     { max:  600, rate: 55,  minCost: 12000, label: 'Региональная (300–600 км)' },
@@ -820,205 +1769,663 @@ const T = {
     { max: 2500, rate: 28,  minCost: 28000, label: 'Магистраль (1500–2500 км)' },
     { max: 9999, rate: 22,  minCost: 32000, label: 'Сверхдальняя (>2500 км)' },
   ],
-
-  /* ── ТАРИФНЫЙ КЛАСС ГРУЗА ──────────────────────────────────────────
-     Аналог классов Деловых Линий (1–6).
-     Промышленное оборудование = тяжёлый плотный груз → низкий класс.
-     Объёмный лёгкий = высокий класс → дороже.
-  ────────────────────────────────────────────────────────────────── */
-  CARGO_CLASS: {
-    '1': 1.00,  // Металл, промоборудование (плотность >500 кг/м³)
-    '2': 1.08,  // Запчасти, ролики (плотность 200–500 кг/м³)
-    '3': 1.15,  // Смешанный (плотность 100–200 кг/м³)
-    '4': 1.28,  // Лёгкий/объёмный (плотность <100 кг/м³)
-  },
-
-  /* ── КОЭФФИЦИЕНТ ВЕСА ─────────────────────────────────────────────
-     Откалиброван: тяжёлые грузы (5–20т) = эффективный тариф,
-     маленькие грузы платят больше за тонну (минималка рейса).
-  ────────────────────────────────────────────────────────────────── */
+  CARGO_CLASS: { '1': 1.00, '2': 1.08, '3': 1.15, '4': 1.28 },
   WEIGHT: [
-    // { до тонн, множитель к базовой ставке }
-    { max: 0.1,  mult: 3.20 }, // Посылка — очень дорого на тонну
-    { max: 0.5,  mult: 2.20 }, // До 500 кг — дорого
-    { max: 1.5,  mult: 1.60 }, // Газель
-    { max: 3.0,  mult: 1.25 }, // Малотоннажник
-    { max: 5.0,  mult: 1.10 }, // 5 т
-    { max: 10.0, mult: 1.00 }, // Стандарт — 10 т (базовый)
-    { max: 20.0, mult: 0.92 }, // Полная загрузка — скидка
-    { max: 30.0, mult: 0.88 }, // Тяжёлая фура
-    { max: 99.0, mult: 1.20 }, // Сверхтяжёлый — спецтранспорт
+    { max: 0.1,  mult: 3.20 },
+    { max: 0.5,  mult: 2.20 },
+    { max: 1.5,  mult: 1.60 },
+    { max: 3.0,  mult: 1.25 },
+    { max: 5.0,  mult: 1.10 },
+    { max: 10.0, mult: 1.00 },
+    { max: 20.0, mult: 0.92 },
+    { max: 30.0, mult: 0.88 },
+    { max: 99.0, mult: 1.20 },
   ],
+  VOL_DENSITY: 250,
+  BODY: { tent: 1.00, board: 1.05, isotherm: 1.18, refrig: 1.42, lowbed: 1.55 },
+  LOAD: { side: 0.08, top: 0.12 },
 
-  /* ── ОБЪЁМНЫЙ ВЕС (Деловые Линии: 1 м³ = 250 кг) ─────────────────
-     Если объёмный вес > фактического → считаем по объёмному.
-  ────────────────────────────────────────────────────────────────── */
-  VOL_DENSITY: 250, // кг/м³
-
-  /* ── ТИП КУЗОВА ───────────────────────────────────────────────── */
-  BODY: {
-    tent:    1.00,
-    board:   1.05,
-    isotherm:1.18,
-    refrig:  1.42,
-    lowbed:  1.55,
+  /* ── LTL: руб/кг × дистанционный коэффициент + базовая подача ── */
+  /*    Калибровано по тарифной сетке Деловых линий ── */
+  LTL: {
+    PICKUP: 1500,            /* терминал-терминал, базовая подача */
+    KG_RATE: [
+      { maxKg: 50,   rate: 35 },   /* до 50 кг — мелкая посылка */
+      { maxKg: 100,  rate: 28 },
+      { maxKg: 300,  rate: 22 },
+      { maxKg: 500,  rate: 18 },
+      { maxKg: 1000, rate: 15 },
+      { maxKg: 1500, rate: 12 },
+    ],
+    DIST_K: [
+      { maxKm: 200,  k: 0.6 },
+      { maxKm: 500,  k: 0.85 },
+      { maxKm: 1000, k: 1.0 },
+      { maxKm: 1500, k: 1.15 },
+      { maxKm: 2500, k: 1.3 },
+      { maxKm: 9999, k: 1.5 },
+    ],
+    /* В LTL объёмный вес считается мягче — 167 кг/м³ (отрасли стандарт) */
+    VOL_DENSITY: 167,
+    /* Минимальная себестоимость LTL-отправки */
+    MIN_COST: 2500,
   },
 
-  /* ── ТИП ЗАГРУЗКИ ─────────────────────────────────────────────── */
-  LOAD: {
-    side: 0.08,  // +8%
-    top:  0.12,  // +12%
-  },
+  /* ── НАДБАВКИ СНГ — общие для FTL и LTL ── */
+  SNG: { rf: 1.00, kz: 1.25, kg: 1.35, by: 1.15 },
 
-  /* ── НАДБАВКИ СНГ ─────────────────────────────────────────────── */
-  SNG: {
-    rf:  1.00,  // Россия — без надбавки
-    kz:  1.25,  // Казахстан +25%
-    kg:  1.35,  // Кыргызстан/Узбекистан +35%
-    by:  1.15,  // Беларусь +15%
-  },
+  /* ── ЦЕНООБРАЗОВАНИЕ ── */
+  MARKET_MARKUP:  1.30,
+  NIKARIN_TARGET: 0.55,
+  CEILING_MULT:   1.15,
 
-  /* ── ЦЕНООБРАЗОВАНИЕ (логика НикАрин) ────────────────────────────
-     Рыночная цена = то, сколько платят корпорации (Деловые Линии + наценка)
-     Целевая цена  = то, за сколько наш логист должен найти частника/ИП
-     Красная линия = максимум, который можно заложить в сделку
-  ────────────────────────────────────────────────────────────────── */
-  MARKET_MARKUP:  1.30,  // +30% от себестоимости = рыночная (ТК-наценка)
-  NIKARIN_TARGET: 0.55,  // 55% от рынка = наша целевая (скидка 45%)
-  CEILING_MULT:   1.15,  // +15% к целевой = красная линия
+  /* ── ПОПРАВКА НА РЕАЛЬНЫЕ ДОРОГИ ── */
+  ROAD_FACTOR: 1.25
 };
 
 /* ══════════════════════════════════════════════════════════════════
-   ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+   STATE
 ══════════════════════════════════════════════════════════════════ */
+const state = {
+  from: { country: null, region: null, city: null },
+  to:   { country: null, region: null, city: null },
+  mode: 'auto',  /* 'auto' | 'manual' */
+  weightUnit: 't', /* 'kg' | 't' */
+  lastResult: null /* сохраняем последний расчёт для генерации КП */
+};
 
-function getZone(km) {
-  return T.ZONES.find(z => km <= z.max) || T.ZONES[T.ZONES.length - 1];
+/* ══════════════════════════════════════════════════════════════════
+   ПЕРЕКЛЮЧАТЕЛЬ ЕДИНИЦ ВЕСА
+══════════════════════════════════════════════════════════════════ */
+function setWeightUnit(unit) {
+  state.weightUnit = unit;
+  document.getElementById('unitKg').classList.toggle('active', unit === 'kg');
+  document.getElementById('unitT').classList.toggle('active',  unit === 't');
+  /* Обновляем плейсхолдер для интуитивности */
+  const inp = document.getElementById('weight');
+  inp.placeholder = unit === 'kg' ? 'например, 300' : 'например, 1.4';
 }
 
-function getWeightMult(tons) {
-  return (T.WEIGHT.find(w => tons <= w.max) || T.WEIGHT[T.WEIGHT.length - 1]).mult;
-}
-
-function fmt(n) {
-  return Math.round(n).toLocaleString('ru-RU') + ' ₽';
-}
-function fmtShort(n) {
-  return Math.round(n).toLocaleString('ru-RU');
-}
-function pct(n) {
-  return (n >= 0 ? '+' : '') + n.toFixed(0) + '%';
+/* Возвращает вес В ТОННАХ независимо от выбранной единицы */
+function getWeightTons() {
+  const v = +document.getElementById('weight').value || 0;
+  return state.weightUnit === 'kg' ? (v / 1000) : v;
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   АВТОРАСЧЁТ ОБЪЁМА + ОБНОВЛЕНИЕ ЗОНЫ
+   УТИЛИТЫ
+══════════════════════════════════════════════════════════════════ */
+function getZone(km) {
+  return T.ZONES.find(z => km <= z.max) || T.ZONES[T.ZONES.length - 1];
+}
+function getWeightMult(tons) {
+  return (T.WEIGHT.find(w => tons <= w.max) || T.WEIGHT[T.WEIGHT.length - 1]).mult;
+}
+function fmt(n) { return Math.round(n).toLocaleString('ru-RU') + ' ₽'; }
+function fmtShort(n) { return Math.round(n).toLocaleString('ru-RU'); }
+
+/* Гаверсинус — расстояние по прямой между двумя точками на Земле */
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) ** 2 +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon/2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+/* Расстояние между городами с поправкой на реальные дороги */
+function distanceBetween(cityA, cityB) {
+  const direct = haversine(cityA.lat, cityA.lon, cityB.lat, cityB.lon);
+  return Math.round(direct * T.ROAD_FACTOR);
+}
+
+/* Эскейп для подсветки */
+function escapeReg(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+function highlight(text, query) {
+  if (!query) return text;
+  const re = new RegExp('(' + escapeReg(query) + ')', 'i');
+  return text.replace(re, '<mark>$1</mark>');
+}
+
+/* Сортировка по алфавиту (русская локаль) */
+function sortAlpha(arr, keyFn) {
+  return arr.slice().sort((a, b) => keyFn(a).localeCompare(keyFn(b), 'ru'));
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   AUTOCOMPLETE
+══════════════════════════════════════════════════════════════════ */
+function setupAutocomplete(inputId, listId, getItems, onSelect) {
+  const input = document.getElementById(inputId);
+  const list  = document.getElementById(listId);
+  let activeIdx = -1;
+  let currentItems = [];
+
+  function render(query) {
+    const allItems = getItems();
+    const q = query.trim().toLowerCase();
+    /* Если пусто — показать все, если есть — фильтр по «начинается с» приоритетно, потом «содержит» */
+    let filtered;
+    if (q === '') {
+      filtered = allItems;
+    } else {
+      const startsWith = allItems.filter(it => it.searchKey.toLowerCase().startsWith(q));
+      const contains   = allItems.filter(it => !it.searchKey.toLowerCase().startsWith(q) && it.searchKey.toLowerCase().includes(q));
+      filtered = [...startsWith, ...contains];
+    }
+    currentItems = filtered;
+    activeIdx = -1;
+
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="ac-empty">// ничего не найдено</div>';
+    } else {
+      list.innerHTML = filtered.map((it, i) =>
+        `<div class="ac-item" data-idx="${i}">
+          ${it.flag ? `<span class="ac-flag">${it.flag}</span>` : ''}
+          <span class="ac-name">${highlight(it.label, query)}</span>
+          ${it.meta ? `<span class="ac-meta">${it.meta}</span>` : ''}
+        </div>`
+      ).join('');
+
+      Array.from(list.querySelectorAll('.ac-item')).forEach(el => {
+        el.addEventListener('mousedown', e => {
+          e.preventDefault();
+          const idx = +el.dataset.idx;
+          select(currentItems[idx]);
+        });
+      });
+    }
+    list.classList.add('open');
+  }
+
+  function select(item) {
+    input.value = item.label;
+    input.classList.add('has-value');
+    list.classList.remove('open');
+    onSelect(item);
+  }
+
+  function setActive(i) {
+    const items = list.querySelectorAll('.ac-item');
+    items.forEach(el => el.classList.remove('active'));
+    if (i >= 0 && i < items.length) {
+      items[i].classList.add('active');
+      items[i].scrollIntoView({ block: 'nearest' });
+    }
+    activeIdx = i;
+  }
+
+  input.addEventListener('focus', () => {
+    if (input.disabled) return;
+    render(input.value);
+  });
+  input.addEventListener('input', () => {
+    input.classList.remove('has-value');
+    render(input.value);
+  });
+  input.addEventListener('keydown', e => {
+    if (!list.classList.contains('open')) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActive(Math.min(activeIdx + 1, currentItems.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActive(Math.max(activeIdx - 1, 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (activeIdx >= 0) select(currentItems[activeIdx]);
+      else if (currentItems.length === 1) select(currentItems[0]);
+    } else if (e.key === 'Escape') {
+      list.classList.remove('open');
+      input.blur();
+    }
+  });
+  document.addEventListener('mousedown', e => {
+    if (!input.contains(e.target) && !list.contains(e.target)) {
+      list.classList.remove('open');
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ИСТОЧНИКИ ДАННЫХ ДЛЯ AUTOCOMPLETE
+══════════════════════════════════════════════════════════════════ */
+function getCountriesItems() {
+  const codes = Object.keys(GEO);
+  const items = codes.map(code => ({
+    code,
+    label: GEO[code].name,
+    flag: GEO[code].flag,
+    searchKey: GEO[code].name,
+    meta: GEO[code].sngCode === 'rf' ? 'РФ' : 'СНГ'
+  }));
+  return sortAlpha(items, it => it.label);
+}
+
+function getRegionsItems(side) {
+  const country = state[side].country;
+  if (!country) return [];
+  const regions = GEO[country].regions;
+  const items = regions.map(r => ({
+    name: r.name,
+    label: r.name,
+    searchKey: r.name,
+    meta: r.cities.length + ' гор.'
+  }));
+  return sortAlpha(items, it => it.label);
+}
+
+function getCitiesItems(side) {
+  const country = state[side].country;
+  const region  = state[side].region;
+  if (!country || !region) return [];
+  const regObj = GEO[country].regions.find(r => r.name === region);
+  if (!regObj) return [];
+  const items = regObj.cities.map(c => ({
+    name: c.name,
+    label: c.name,
+    searchKey: c.name,
+    lat: c.lat,
+    lon: c.lon,
+    isCapital: c.isCapital,
+    meta: c.isCapital ? '★ центр' : ''
+  }));
+  return sortAlpha(items, it => it.label);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ОБРАБОТЧИКИ ВЫБОРА
+══════════════════════════════════════════════════════════════════ */
+function onCountrySelect(side, item) {
+  state[side].country = item.code;
+  state[side].region = null;
+  state[side].city = null;
+
+  const regionInput = document.getElementById(side + 'Region');
+  const cityInput   = document.getElementById(side + 'City');
+  regionInput.value = '';
+  regionInput.disabled = false;
+  regionInput.placeholder = 'Введите или выберите регион';
+  regionInput.classList.remove('has-value');
+  cityInput.value = '';
+  cityInput.disabled = true;
+  cityInput.placeholder = 'Сначала выберите регион';
+  cityInput.classList.remove('has-value');
+
+  recomputeDistance();
+}
+
+function onRegionSelect(side, item) {
+  state[side].region = item.name;
+  state[side].city = null;
+
+  const cityInput = document.getElementById(side + 'City');
+  cityInput.value = '';
+  cityInput.disabled = false;
+  cityInput.placeholder = 'Введите или выберите город';
+  cityInput.classList.remove('has-value');
+
+  recomputeDistance();
+}
+
+function onCitySelect(side, item) {
+  state[side].city = { name: item.name, lat: item.lat, lon: item.lon };
+  recomputeDistance();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   РАСЧЁТ РАССТОЯНИЯ + UI
+══════════════════════════════════════════════════════════════════ */
+function recomputeDistance() {
+  const banner = document.getElementById('distBanner');
+  const label  = document.getElementById('distLabel');
+  const detail = document.getElementById('distDetail');
+  const value  = document.getElementById('distValue');
+
+  if (state.mode === 'manual') {
+    banner.classList.add('empty');
+    label.textContent  = 'Режим ручного ввода';
+    detail.textContent = 'Расстояние берётся из поля ниже';
+    value.textContent  = '— км';
+    updateZoneInfo();
+    return;
+  }
+
+  const f = state.from, t = state.to;
+  if (f.city && t.city) {
+    const km = distanceBetween(f.city, t.city);
+    banner.classList.remove('empty');
+    label.textContent  = `${GEO[f.country].name} → ${GEO[t.country].name}`;
+    detail.textContent = `${f.city.name} → ${t.city.name} · по координатам × коэф. дорог 1.25`;
+    value.textContent  = km.toLocaleString('ru-RU') + ' км';
+  } else {
+    banner.classList.add('empty');
+    label.textContent  = 'Расстояние не определено';
+    let parts = [];
+    if (!f.country) parts.push('отправление: страну');
+    else if (!f.region) parts.push('отправление: регион');
+    else if (!f.city) parts.push('отправление: город');
+    if (!t.country) parts.push('назначение: страну');
+    else if (!t.region) parts.push('назначение: регион');
+    else if (!t.city) parts.push('назначение: город');
+    detail.textContent = 'Выберите ' + parts.join(', ');
+    value.textContent  = '— км';
+  }
+  updateZoneInfo();
+}
+
+function getCurrentDistance() {
+  if (state.mode === 'manual') {
+    return +document.getElementById('manualDistance').value || 0;
+  }
+  if (state.from.city && state.to.city) {
+    return distanceBetween(state.from.city, state.to.city);
+  }
+  return 0;
+}
+
+function getCurrentRouteType() {
+  if (state.mode === 'manual') {
+    return document.getElementById('manualRouteType').value;
+  }
+  /* Автоматическое определение SNG-кода: */
+  /* Если страны разные → берём максимальную надбавку из двух */
+  /* Если одна страна → её SNG */
+  const f = state.from.country, t = state.to.country;
+  if (!f && !t) return 'rf';
+  if (!f) return GEO[t].sngCode;
+  if (!t) return GEO[f].sngCode;
+  if (f === t) return GEO[f].sngCode;
+  /* Разные страны: берём более дорогой код */
+  const order = { rf: 0, by: 1, kz: 2, kg: 3 };
+  const fCode = GEO[f].sngCode, tCode = GEO[t].sngCode;
+  return order[fCode] >= order[tCode] ? fCode : tCode;
+}
+
+function updateZoneInfo() {
+  const km = getCurrentDistance();
+  const routeType = getCurrentRouteType();
+  const sngNames = { rf: 'РФ внутри', by: 'РФ ↔ Беларусь/Кавказ', kz: 'РФ ↔ Казахстан', kg: 'РФ ↔ Узб./Кырг./Тадж.' };
+
+  if (km > 0) {
+    const zone = getZone(km);
+    document.getElementById('zoneName').textContent = zone.label;
+    document.getElementById('zoneRate').textContent = zone.rate + ' руб/км';
+    document.getElementById('zoneMin').textContent  = fmt(zone.minCost);
+    document.getElementById('zoneSng').textContent  = sngNames[routeType] + ' (' + (T.SNG[routeType] === 1 ? 'без надб.' : '+' + Math.round((T.SNG[routeType]-1)*100) + '%') + ')';
+  } else {
+    ['zoneName','zoneRate','zoneMin','zoneSng'].forEach(id => {
+      document.getElementById(id).textContent = '—';
+    });
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   TOGGLE АВТО ↔ ВРУЧНУЮ
+══════════════════════════════════════════════════════════════════ */
+function switchTab(mode) {
+  state.mode = mode;
+  document.getElementById('tabAuto').classList.toggle('active', mode === 'auto');
+  document.getElementById('tabManual').classList.toggle('active', mode === 'manual');
+  document.getElementById('manualKm').classList.toggle('visible', mode === 'manual');
+  recomputeDistance();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ПОМЕНЯТЬ МЕСТАМИ
+══════════════════════════════════════════════════════════════════ */
+function swapRoute() {
+  const tmp = { ...state.from };
+  state.from = { ...state.to };
+  state.to = tmp;
+
+  /* Переписать инпуты */
+  ['from','to'].forEach(side => {
+    const s = state[side];
+    const cInput = document.getElementById(side + 'Country');
+    const rInput = document.getElementById(side + 'Region');
+    const cityInput = document.getElementById(side + 'City');
+
+    if (s.country) {
+      cInput.value = GEO[s.country].name;
+      cInput.classList.add('has-value');
+      rInput.disabled = false;
+      rInput.placeholder = 'Введите или выберите регион';
+    } else {
+      cInput.value = '';
+      cInput.classList.remove('has-value');
+      rInput.disabled = true;
+      rInput.placeholder = 'Сначала выберите страну';
+    }
+
+    if (s.region) {
+      rInput.value = s.region;
+      rInput.classList.add('has-value');
+      cityInput.disabled = false;
+      cityInput.placeholder = 'Введите или выберите город';
+    } else {
+      rInput.value = '';
+      rInput.classList.remove('has-value');
+      cityInput.disabled = true;
+      cityInput.placeholder = 'Сначала выберите регион';
+    }
+
+    if (s.city) {
+      cityInput.value = s.city.name;
+      cityInput.classList.add('has-value');
+    } else {
+      cityInput.value = '';
+      cityInput.classList.remove('has-value');
+    }
+  });
+  recomputeDistance();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   АВТОРАСЧЁТ ОБЪЁМА
 ══════════════════════════════════════════════════════════════════ */
 function onInput() {
-  // Объём
   const l = +document.getElementById('len').value;
   const w = +document.getElementById('wid').value;
   const h = +document.getElementById('hei').value;
   const vd = document.getElementById('volDisplay');
-  let vol = 0;
   if (l > 0 && w > 0 && h > 0) {
-    vol = l * w * h;
+    const vol = l * w * h;
     vd.textContent = vol.toFixed(2) + ' м³';
     vd.classList.remove('empty');
   } else {
     vd.textContent = 'не задан';
     vd.classList.add('empty');
   }
+}
 
-  // Зона
-  const km = +document.getElementById('distance').value;
-  if (km > 0) {
-    const zone = getZone(km);
-    document.getElementById('zoneName').textContent = zone.label;
-    document.getElementById('zoneRate').textContent = zone.rate + ' руб/км';
-    document.getElementById('zoneMin').textContent  = fmt(zone.minCost);
-  } else {
-    document.getElementById('zoneName').textContent = '—';
-    document.getElementById('zoneRate').textContent = '—';
-    document.getElementById('zoneMin').textContent  = '—';
-  }
+/* ══════════════════════════════════════════════════════════════════
+   ЯДРО РАСЧЁТА — LTL (сборный груз)
+══════════════════════════════════════════════════════════════════ */
+function computeLTL(weightKg, volM3, km, sngMult) {
+  /* Объёмный вес в LTL: 1 м³ = 167 кг */
+  const volWeightKg = volM3 * T.LTL.VOL_DENSITY;
+  const calcKg = Math.max(weightKg, volWeightKg);
+  const usesVol = volWeightKg > weightKg;
+
+  /* Ставка руб/кг по ступеням веса */
+  const rateRow = T.LTL.KG_RATE.find(r => calcKg <= r.maxKg) ||
+                  T.LTL.KG_RATE[T.LTL.KG_RATE.length - 1];
+  const ratePerKg = rateRow.rate;
+
+  /* Дистанционный коэффициент */
+  const distRow = T.LTL.DIST_K.find(d => km <= d.maxKm);
+  const distK = distRow.k;
+
+  /* Себестоимость до СНГ */
+  const cargo = calcKg * ratePerKg * distK;
+  const baseCost = T.LTL.PICKUP + cargo;
+  const costPreSng = Math.max(baseCost, T.LTL.MIN_COST);
+  const totalCost = costPreSng * sngMult;
+
+  return {
+    mode: 'LTL',
+    calcWeight: calcKg,
+    weightUnit: 'кг',
+    usesVol,
+    pickupCost: T.LTL.PICKUP,
+    cargoCost: cargo,
+    ratePerKg,
+    distK,
+    totalCost,
+    breakdown: {
+      base: T.LTL.PICKUP,
+      cargo: cargo,
+      ratePerUnit: `${ratePerKg} ₽/кг × коэф.${distK}`,
+      sngMult
+    }
+  };
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ЯДРО РАСЧЁТА — FTL (отдельная машина)
+══════════════════════════════════════════════════════════════════ */
+function computeFTL(weightTons, volM3, km, cargoClass, bodyType, loadAdd, sngMult) {
+  /* Объёмный вес FTL: 1 м³ = 250 кг */
+  const volWeightTons = (volM3 * T.VOL_DENSITY) / 1000;
+  const calcWeight = Math.max(weightTons, volWeightTons);
+  const usesVol = volWeightTons > weightTons;
+
+  const zone = getZone(km);
+  const basePerKm = zone.rate;
+  const baseCost = basePerKm * km;
+  const minCost = zone.minCost;
+  const weightMult = getWeightMult(calcWeight);
+  const afterWeight = Math.max(baseCost * weightMult, minCost);
+  const classMult = T.CARGO_CLASS[cargoClass] || 1.0;
+  const afterClass = afterWeight * classMult;
+  const bodyCo = T.BODY[bodyType] || 1.0;
+  const loadCo = 1.0 + loadAdd;
+  const costPreSng = afterClass * bodyCo * loadCo;
+  const totalCost = costPreSng * sngMult;
+
+  return {
+    mode: 'FTL',
+    calcWeight: calcWeight,
+    weightUnit: 'т',
+    usesVol,
+    zone,
+    basePerKm,
+    baseCost,
+    minCost,
+    weightMult,
+    classMult,
+    bodyCo,
+    loadCo,
+    totalCost,
+    breakdown: {
+      base: baseCost,
+      basePerUnit: `${basePerKm} ₽/км × ${km} км`,
+      weightMult,
+      classMult,
+      bodyCo,
+      loadCo,
+      minApplied: baseCost * weightMult < minCost,
+      sngMult
+    }
+  };
 }
 
 /* ══════════════════════════════════════════════════════════════════
    ОСНОВНОЙ РАСЧЁТ
 ══════════════════════════════════════════════════════════════════ */
 function calculate() {
-  const km         = +document.getElementById('distance').value  || 0;
-  const weightTons = +document.getElementById('weight').value    || 0;
-  const len        = +document.getElementById('len').value       || 0;
-  const wid        = +document.getElementById('wid').value       || 0;
-  const hei        = +document.getElementById('hei').value       || 0;
-  const routeType  = document.getElementById('routeType').value;
-  const bodyType   = document.getElementById('bodyType').value;
+  const km = getCurrentDistance();
+  const weightTons = getWeightTons();
+  const len = +document.getElementById('len').value || 0;
+  const wid = +document.getElementById('wid').value || 0;
+  const hei = +document.getElementById('hei').value || 0;
+  const routeType = getCurrentRouteType();
+  const bodyType  = document.getElementById('bodyType').value;
   const cargoClass = document.getElementById('cargoClass').value;
-  const loadSide   = document.getElementById('loadSide').checked;
-  const loadTop    = document.getElementById('loadTop').checked;
+  const loadSide = document.getElementById('loadSide').checked;
+  const loadTop  = document.getElementById('loadTop').checked;
 
-  if (km <= 0 || weightTons <= 0) {
-    alert('Укажите расстояние и вес груза');
+  if (km <= 0) {
+    alert('Не определено расстояние. Выберите города отправления и назначения, либо переключитесь на ручной ввод.');
+    return;
+  }
+  if (weightTons <= 0) {
+    alert('Укажите вес груза (не забудьте проверить, что выбрана правильная единица — кг или т)');
     return;
   }
 
-  /* 1. ОПРЕДЕЛЯЕМ РАСЧЁТНЫЙ ВЕС (больший из фактического и объёмного) */
   const vol = (len > 0 && wid > 0 && hei > 0) ? len * wid * hei : 0;
-  const volWeightTons = vol > 0 ? (vol * T.VOL_DENSITY) / 1000 : 0;
-  const calcWeight = Math.max(weightTons, volWeightTons);
-  const usesVol = vol > 0 && volWeightTons > weightTons;
+  const sngMult = T.SNG[routeType] || 1.0;
 
-  /* 2. ЗОНА и базовая ставка */
-  const zone = getZone(km);
-  const basePerKm = zone.rate;
+  /* ── ВЫБОР РЕЖИМА: LTL vs FTL ── */
+  /* LTL: ≤1.5т И ≤3м³. Иначе FTL. */
+  const isLTL = (weightTons <= T.FTL_THRESHOLD.weightTons) &&
+                (vol === 0 || vol <= T.FTL_THRESHOLD.volumeM3);
 
-  /* 3. БАЗОВАЯ СТОИМОСТЬ = ставка × расстояние */
-  const baseCost = basePerKm * km;
-
-  /* 4. МИНИМАЛЬНАЯ СТОИМОСТЬ РЕЙСА */
-  const minCost = zone.minCost;
-
-  /* 5. ПОПРАВКА НА ВЕС */
-  const weightMult = getWeightMult(calcWeight);
-  const afterWeight = Math.max(baseCost * weightMult, minCost);
-
-  /* 6. КЛАСС ГРУЗА */
-  const classMult = T.CARGO_CLASS[cargoClass] || 1.0;
-  const afterClass = afterWeight * classMult;
-
-  /* 7. КУЗОВ */
-  const bodyCo = T.BODY[bodyType] || 1.0;
-
-  /* 8. ЗАГРУЗКА */
   let loadAdd = 0;
   if (loadSide) loadAdd = Math.max(loadAdd, T.LOAD.side);
   if (loadTop)  loadAdd = Math.max(loadAdd, T.LOAD.top);
-  const loadCo = 1.0 + loadAdd;
 
-  /* 9. СЕБЕСТОИМОСТЬ ДО СНГ */
-  const costPreSng = afterClass * bodyCo * loadCo;
+  let result;
+  if (isLTL) {
+    const weightKg = weightTons * 1000;
+    result = computeLTL(weightKg, vol, km, sngMult);
+  } else {
+    result = computeFTL(weightTons, vol, km, cargoClass, bodyType, loadAdd, sngMult);
+  }
 
-  /* 10. НАДБАВКА СНГ */
-  const sngMult = T.SNG[routeType] || 1.0;
-  const totalCost = costPreSng * sngMult;
-
-  /* 11. РЫНОЧНАЯ ЦЕНА (Деловые Линии + корпоративная наценка) */
+  const totalCost = result.totalCost;
   const priceMarket  = totalCost * T.MARKET_MARKUP;
-
-  /* 12. ЦЕЛЕВАЯ ЦЕНА (что должен найти наш логист у частника) */
   const priceTarget  = priceMarket * T.NIKARIN_TARGET;
-
-  /* 13. КРАСНАЯ ЛИНИЯ */
   const priceCeiling = priceTarget * T.CEILING_MULT;
-
-  /* 14. ЭКОНОМИЯ */
   const economy = priceMarket - priceTarget;
   const economyPct = Math.round((economy / priceMarket) * 100);
 
-  /* ── ЗАПОЛНЯЕМ ИНТЕРФЕЙС ── */
-  const routeNames = { rf:'Россия', kz:'Казахстан', kg:'Киргизия/Узб.', by:'Беларусь' };
-  const bodyNames  = { tent:'Тент', board:'Борт', isotherm:'Изотерм', refrig:'Рефриж.', lowbed:'Трал' };
+  /* Сохраняем результат для КП */
+  state.lastResult = {
+    mode: result.mode,
+    km, weightTons,
+    vol, len, wid, hei,
+    routeType, bodyType, cargoClass,
+    loadSide, loadTop,
+    priceMarket, priceTarget, priceCeiling,
+    totalCost, economy, economyPct,
+    from: state.from, to: state.to,
+    detail: result,
+    timestamp: new Date().toLocaleString('ru-RU')
+  };
+
+  /* ── РЕНДЕР ── */
+  /* Бейдж режима */
+  const expl = document.getElementById('modeExplainer');
+  expl.style.display = 'block';
+  if (result.mode === 'LTL') {
+    expl.classList.remove('ftl');
+    expl.classList.add('ltl');
+    document.getElementById('modeText').innerHTML =
+      `<strong style="color:var(--green)">СБОРНЫЙ ГРУЗ (LTL)</strong> — груз ${result.usesVol ? 'объёмом ' + vol.toFixed(1) + ' м³' : (weightTons*1000).toFixed(0) + ' кг'} едет в составе фуры с другими отправлениями. Цена считается по тарифу руб/кг (модель Деловых линий). При весе свыше 1.5 т или объёме свыше 3 м³ автоматически включится режим отдельной машины (FTL).`;
+  } else {
+    expl.classList.remove('ltl');
+    expl.classList.add('ftl');
+    document.getElementById('modeText').innerHTML =
+      `<strong style="color:var(--navy)">ОТДЕЛЬНАЯ МАШИНА (FTL)</strong> — груз ${result.usesVol ? 'объёмом ' + vol.toFixed(1) + ' м³' : weightTons + ' т'} занимает машину целиком. Цена считается по тарифу руб/км × коэффициенты класса груза, кузова и загрузки.`;
+  }
+
+  /* Маршрут */
+  let routeText = '';
+  if (state.mode === 'manual') {
+    const rNames = { rf: 'РФ', by: 'СНГ (Бел./Кавк.)', kz: 'Казахстан', kg: 'Узб./Кырг./Тадж.' };
+    routeText = rNames[routeType] + ' · ' + km + ' км (вручную)';
+  } else if (state.from.city && state.to.city) {
+    routeText = `${state.from.city.name} → ${state.to.city.name}`;
+  }
+
+  const bodyNames = { tent:'Тент', board:'Борт', isotherm:'Изотерм', refrig:'Рефриж.', lowbed:'Трал' };
   const loads = [];
   if (document.getElementById('loadRear').checked) loads.push('Задняя');
   if (loadSide) loads.push('Боковая');
@@ -1026,37 +2433,49 @@ function calculate() {
   if (!loads.length) loads.push('Задняя');
 
   document.getElementById('pMarket').textContent  = fmtShort(priceMarket);
-  document.getElementById('uMarket').textContent  = 'руб.';
   document.getElementById('pTarget').textContent  = fmtShort(priceTarget);
-  document.getElementById('uTarget').textContent  = 'руб. · Target Price';
   document.getElementById('pCeiling').textContent = fmtShort(priceCeiling);
-  document.getElementById('uCeiling').textContent = 'руб. · Ceiling Price';
 
+  document.getElementById('pRoute').textContent    = routeText || '—';
   document.getElementById('pDistance').textContent = km.toLocaleString('ru-RU') + ' км';
-  document.getElementById('pWeight').textContent   = weightTons + ' т' +
-    (usesVol ? ` (объём: ${vol.toFixed(1)} м³)` : vol > 0 ? ` / ${vol.toFixed(1)} м³` : '');
-  document.getElementById('pZone').textContent     = zone.label.split('(')[0].trim() + ' · ' + routeNames[routeType];
-  document.getElementById('pBody').textContent     = bodyNames[bodyType] + ' / ' + loads.join('+');
 
-  // Детализация
-  document.getElementById('dBase').textContent    = fmt(baseCost) + ` (${basePerKm}₽/км × ${km}км)`;
-  document.getElementById('dMin').textContent     = fmt(minCost) + (baseCost < minCost ? ' ← применён' : ' (не применён)');
-  document.getElementById('dWeight').textContent  = `×${weightMult.toFixed(2)} (${calcWeight.toFixed(2)}т${usesVol ? ' объёмный' : ''})`;
-  document.getElementById('dBody').textContent    = `×${bodyCo.toFixed(2)} кузов, ×${loadCo.toFixed(2)} загрузка`;
-  document.getElementById('dSng').textContent     = sngMult > 1 ? `×${sngMult.toFixed(2)} (+${Math.round((sngMult-1)*100)}%)` : 'нет (РФ)';
-  document.getElementById('dCost').textContent    = fmt(totalCost);
+  /* Вес — показываем в исходной единице */
+  let weightDisplay;
+  if (state.weightUnit === 'kg') {
+    weightDisplay = (weightTons * 1000).toFixed(0) + ' кг';
+  } else {
+    weightDisplay = weightTons + ' т';
+  }
+  document.getElementById('pWeight').textContent =
+    weightDisplay + (result.usesVol ? ` (объём: ${vol.toFixed(1)} м³)` : vol > 0 ? ` / ${vol.toFixed(1)} м³` : '');
+  document.getElementById('pBody').textContent =
+    (result.mode === 'LTL') ? 'Сборный (LTL)' : (bodyNames[bodyType] + ' / ' + loads.join('+'));
+
+  /* Детализация */
+  if (result.mode === 'LTL') {
+    document.getElementById('dBase').textContent    = fmt(result.pickupCost) + ' (подача терминала)';
+    document.getElementById('dMin').textContent     = fmt(T.LTL.MIN_COST) +
+      (result.pickupCost + result.cargoCost < T.LTL.MIN_COST ? ' ← применён' : ' (не применён)');
+    document.getElementById('dWeight').textContent  = `${result.calcWeight.toFixed(0)} кг × ${result.ratePerKg} ₽/кг = ${fmt(result.calcWeight * result.ratePerKg)}`;
+    document.getElementById('dBody').textContent    = `× коэф. ${result.distK} (дистанция)`;
+  } else {
+    document.getElementById('dBase').textContent    = fmt(result.baseCost) + ` (${result.basePerKm}₽/км × ${km}км)`;
+    document.getElementById('dMin').textContent     = fmt(result.minCost) +
+      (result.breakdown.minApplied ? ' ← применён' : ' (не применён)');
+    document.getElementById('dWeight').textContent  = `×${result.weightMult.toFixed(2)} (${result.calcWeight.toFixed(2)}т${result.usesVol ? ' объёмный' : ''})`;
+    document.getElementById('dBody').textContent    = `×${result.bodyCo.toFixed(2)} кузов, ×${result.loadCo.toFixed(2)} загрузка, ×${result.classMult.toFixed(2)} класс`;
+  }
+  document.getElementById('dSng').textContent  = sngMult > 1 ? `×${sngMult.toFixed(2)} (+${Math.round((sngMult-1)*100)}%)` : 'нет (РФ)';
+  document.getElementById('dCost').textContent = fmt(totalCost);
   document.getElementById('dMarket').textContent  = `+${Math.round((T.MARKET_MARKUP-1)*100)}% = ${fmt(priceMarket)}`;
   document.getElementById('dNikarin').textContent = `−${economyPct}% = ${fmt(priceTarget)}`;
-
-  // Экономия
   document.getElementById('economyVal').textContent = '−' + fmt(economy) + '  (−' + economyPct + '%)';
 
-  // Прогресс-бар
+  /* Прогресс-бар */
   const maxVal     = priceMarket * 1.06;
   const targetPct  = (priceTarget  / maxVal) * 100;
   const ceilingPct = (priceCeiling / maxVal) * 100;
   const marketPct  = (priceMarket  / maxVal) * 100;
-
   document.getElementById('barMarket').style.width = marketPct  + '%';
   document.getElementById('barTrade').style.left   = targetPct  + '%';
   document.getElementById('barTrade').style.width  = (ceilingPct - targetPct) + '%';
@@ -1064,47 +2483,228 @@ function calculate() {
   document.getElementById('bLabelC').textContent = '↑ ' + fmtShort(priceCeiling) + ' ₽';
   document.getElementById('bLabelM').textContent =        fmtShort(priceMarket)  + ' ₽';
 
-  // Показать результаты
   const res = document.getElementById('results');
   res.classList.add('visible');
-
-  // Сброс анимаций
   document.querySelectorAll('.anim').forEach(el => {
     el.style.animation = 'none';
     void el.offsetHeight;
     el.style.animation = '';
   });
-
   setTimeout(() => res.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   СБРОС
+   ГЕНЕРАЦИЯ КП ДЛЯ КЛИЕНТА
+   Открывает чистую печатную страницу с расчётом
+   Логист/менеджер нажимает Ctrl+P → "Сохранить как PDF"
 ══════════════════════════════════════════════════════════════════ */
+function generateKP() {
+  const r = state.lastResult;
+  if (!r) {
+    alert('Сначала выполните расчёт');
+    return;
+  }
+
+  /* Определяем единицы веса для отображения */
+  let weightDisplay = (state.weightUnit === 'kg')
+    ? (r.weightTons * 1000).toFixed(0) + ' кг'
+    : r.weightTons + ' т';
+
+  let routeText = '';
+  if (state.mode === 'manual') {
+    routeText = r.km + ' км';
+  } else if (r.from.city && r.to.city) {
+    routeText = `${r.from.city.name} → ${r.to.city.name} (${r.km.toLocaleString('ru-RU')} км)`;
+  }
+
+  const bodyNames = { tent:'Тент', board:'Борт', isotherm:'Изотерм', refrig:'Рефрижератор', lowbed:'Низкорамный трал' };
+
+  const html = `<!DOCTYPE html>
+<html lang="ru"><head><meta charset="UTF-8">
+<title>КП на перевозку — ${routeText}</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; color: #0F1923; padding: 40px; background: #fff; max-width: 800px; margin: 0 auto; line-height: 1.5; }
+  .kp-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 24px; border-bottom: 3px solid #1A2B4A; }
+  .kp-logo { font-family: 'Unbounded', sans-serif; font-size: 22px; font-weight: 700; color: #1A2B4A; }
+  .kp-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #7A8899; letter-spacing: 1.5px; margin-top: 4px; text-transform: uppercase; }
+  .kp-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #7A8899; text-align: right; letter-spacing: 0.5px; }
+  .kp-title { font-family: 'Unbounded', sans-serif; font-size: 20px; font-weight: 600; margin: 32px 0 24px; color: #1A2B4A; }
+  .kp-section { margin-bottom: 28px; }
+  .kp-section-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: #C9881A; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid #DDE0E6; }
+  .kp-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #F0F1F3; }
+  .kp-row:last-child { border-bottom: none; }
+  .kp-label { color: #3D4F66; font-size: 14px; }
+  .kp-value { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; color: #1A2B4A; }
+  .kp-price-card { background: linear-gradient(135deg, #1A2B4A 0%, #243555 100%); color: #fff; padding: 28px; margin: 28px 0; }
+  .kp-price-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #E8A020; margin-bottom: 8px; }
+  .kp-price { font-family: 'Unbounded', sans-serif; font-size: 42px; font-weight: 700; letter-spacing: -1px; }
+  .kp-price-note { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 8px; }
+  .kp-conditions { background: #F4F5F7; padding: 16px; border-left: 3px solid #C9881A; font-size: 12px; line-height: 1.6; color: #3D4F66; }
+  .kp-conditions strong { color: #1A2B4A; }
+  .kp-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #DDE0E6; text-align: center; font-size: 11px; color: #7A8899; line-height: 1.6; }
+  .kp-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .kp-compare-cell { padding: 14px; border: 1px solid #DDE0E6; }
+  .kp-compare-cell.market { background: #F4F5F7; }
+  .kp-compare-cell.us { background: rgba(34,160,90,0.08); border-color: rgba(26,122,69,0.30); }
+  .kp-compare-tag { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #7A8899; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+  .kp-compare-cell.us .kp-compare-tag { color: #1A7A45; }
+  .kp-compare-val { font-family: 'Unbounded', sans-serif; font-size: 22px; font-weight: 700; color: #3D4F66; }
+  .kp-compare-cell.us .kp-compare-val { color: #1A7A45; }
+  @media print { body { padding: 20px; } @page { margin: 1cm; } }
+  .kp-print-btn { position: fixed; top: 20px; right: 20px; background: #1A2B4A; color: #fff; border: none; padding: 12px 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; }
+  @media print { .kp-print-btn { display: none; } }
+</style>
+</head>
+<body>
+<button class="kp-print-btn" onclick="window.print()">🖨 Распечатать / PDF</button>
+
+<div class="kp-header">
+  <div>
+    <div class="kp-logo">ПартнёрПромСнаб</div>
+    <div class="kp-sub">Промышленные поставки · Челябинск</div>
+  </div>
+  <div class="kp-meta">
+    КП № ${Date.now().toString().slice(-6)}<br>
+    ${r.timestamp}
+  </div>
+</div>
+
+<div class="kp-title">Коммерческое предложение на перевозку груза</div>
+
+<div class="kp-section">
+  <div class="kp-section-title">// Параметры маршрута</div>
+  <div class="kp-row"><span class="kp-label">Маршрут</span><span class="kp-value">${routeText}</span></div>
+  <div class="kp-row"><span class="kp-label">Расстояние</span><span class="kp-value">${r.km.toLocaleString('ru-RU')} км</span></div>
+  ${r.from.country && r.to.country ? `<div class="kp-row"><span class="kp-label">Страны</span><span class="kp-value">${GEO[r.from.country].name} → ${GEO[r.to.country].name}</span></div>` : ''}
+</div>
+
+<div class="kp-section">
+  <div class="kp-section-title">// Характеристики груза</div>
+  <div class="kp-row"><span class="kp-label">Вес</span><span class="kp-value">${weightDisplay}</span></div>
+  ${r.vol > 0 ? `<div class="kp-row"><span class="kp-label">Габариты / Объём</span><span class="kp-value">${r.len}×${r.wid}×${r.hei} м (${r.vol.toFixed(2)} м³)</span></div>` : ''}
+  <div class="kp-row"><span class="kp-label">Тип перевозки</span><span class="kp-value">${r.mode === 'LTL' ? 'Сборный груз (LTL)' : 'Отдельная машина (FTL)'}</span></div>
+  ${r.mode === 'FTL' ? `<div class="kp-row"><span class="kp-label">Транспорт</span><span class="kp-value">${bodyNames[r.bodyType]}</span></div>` : ''}
+</div>
+
+<div class="kp-price-card">
+  <div class="kp-price-label">⬡ Стоимость перевозки</div>
+  <div class="kp-price">${fmtShort(r.priceTarget)} ₽</div>
+  <div class="kp-price-note">с НДС / без НДС — уточняется при подписании. Срок действия КП: 7 календарных дней.</div>
+</div>
+
+<div class="kp-section">
+  <div class="kp-section-title">// Сравнение с рынком</div>
+  <div class="kp-comparison">
+    <div class="kp-compare-cell market">
+      <div class="kp-compare-tag">Цена крупных ТК</div>
+      <div class="kp-compare-val">${fmtShort(r.priceMarket)} ₽</div>
+    </div>
+    <div class="kp-compare-cell us">
+      <div class="kp-compare-tag">Наше предложение</div>
+      <div class="kp-compare-val">${fmtShort(r.priceTarget)} ₽</div>
+    </div>
+  </div>
+  <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #1A7A45; font-weight: 600; text-align: right;">Ваша экономия: ${fmtShort(r.economy)} ₽ (−${r.economyPct}%)</div>
+</div>
+
+<div class="kp-section">
+  <div class="kp-section-title">// Условия</div>
+  <div class="kp-conditions">
+    <strong>В стоимость включено:</strong> подача транспорта, перевозка по маршруту, базовое страхование ответственности перевозчика.<br><br>
+    <strong>Дополнительные расходы (по факту):</strong> простой транспорта свыше нормативного, экспедирование за рамками маршрута, особые требования к креплению/таможне.<br><br>
+    <strong>Условия оплаты:</strong> по согласованию (предоплата 30% / постоплата по факту доставки).<br><br>
+    <strong>Срок подачи транспорта:</strong> 1–3 рабочих дня после подтверждения заявки.
+  </div>
+</div>
+
+<div class="kp-footer">
+  ООО «ПартнёрПромСнаб» · г. Челябинск · ИНН [укажите] · КПП [укажите]<br>
+  Тел.: [телефон] · E-mail: [почта] · Сайт: [сайт]<br>
+  <em style="color: #A8B4C0;">Расчёт предварительный. Окончательная стоимость подтверждается логистом.</em>
+</div>
+</body></html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+}
 function reset() {
-  ['distance','weight','len','wid','hei'].forEach(id => {
+  ['weight','len','wid','hei','manualDistance'].forEach(id => {
     document.getElementById(id).value = '';
   });
-  document.getElementById('routeType').value  = 'rf';
-  document.getElementById('bodyType').value   = 'tent';
-  document.getElementById('cargoClass').value = '1';
-  document.getElementById('loadRear').checked = false;
-  document.getElementById('loadSide').checked = false;
-  document.getElementById('loadTop').checked  = false;
-  const vd = document.getElementById('volDisplay');
-  vd.textContent = 'не задан';
-  vd.classList.add('empty');
-  ['zoneName','zoneRate','zoneMin'].forEach(id => {
-    document.getElementById(id).textContent = '—';
+  ['fromCountry','fromRegion','fromCity','toCountry','toRegion','toCity'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = '';
+    el.classList.remove('has-value');
   });
+  ['fromRegion','fromCity','toRegion','toCity'].forEach(id => {
+    const el = document.getElementById(id);
+    el.disabled = true;
+  });
+  document.getElementById('fromRegion').placeholder = 'Сначала выберите страну';
+  document.getElementById('toRegion').placeholder   = 'Сначала выберите страну';
+  document.getElementById('fromCity').placeholder   = 'Сначала выберите регион';
+  document.getElementById('toCity').placeholder     = 'Сначала выберите регион';
+
+  document.getElementById('manualRouteType').value = 'rf';
+  document.getElementById('bodyType').value = 'tent';
+  document.getElementById('cargoClass').value = '1';
+  ['loadRear','loadSide','loadTop'].forEach(id => document.getElementById(id).checked = false);
+
+  /* Сброс единиц веса в "т" */
+  setWeightUnit('t');
+
+  const vd = document.getElementById('volDisplay');
+  vd.textContent = 'не задан'; vd.classList.add('empty');
+
+  state.from = { country: null, region: null, city: null };
+  state.to   = { country: null, region: null, city: null };
+  state.lastResult = null;
+  switchTab('auto');
+
+  /* Скрываем объяснитель режима */
+  document.getElementById('modeExplainer').style.display = 'none';
+
   document.getElementById('results').classList.remove('visible');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Enter → расчёт
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && e.target.tagName !== 'BUTTON') calculate();
-});
+/* ══════════════════════════════════════════════════════════════════
+   ИНИЦИАЛИЗАЦИЯ
+══════════════════════════════════════════════════════════════════ */
+function init() {
+  /* From */
+  setupAutocomplete('fromCountry', 'fromCountryList',
+    () => getCountriesItems(),
+    item => onCountrySelect('from', item));
+  setupAutocomplete('fromRegion', 'fromRegionList',
+    () => getRegionsItems('from'),
+    item => onRegionSelect('from', item));
+  setupAutocomplete('fromCity', 'fromCityList',
+    () => getCitiesItems('from'),
+    item => onCitySelect('from', item));
+
+  /* To */
+  setupAutocomplete('toCountry', 'toCountryList',
+    () => getCountriesItems(),
+    item => onCountrySelect('to', item));
+  setupAutocomplete('toRegion', 'toRegionList',
+    () => getRegionsItems('to'),
+    item => onRegionSelect('to', item));
+  setupAutocomplete('toCity', 'toCityList',
+    () => getCitiesItems('to'),
+    item => onCitySelect('to', item));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
+      calculate();
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
